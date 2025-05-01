@@ -49,7 +49,7 @@ export const api = {
   /**
    * Make a POST request
    */
-  post: async <T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> => {
+  post: async <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> => {
     try {
       const response: AxiosResponse<T> = await apiClient.post(url, data, config);
       return response.data;
@@ -61,17 +61,10 @@ export const api = {
   /**
    * Upload a file using FormData
    */
-  uploadFile: async <T>(url: string, file: File, fieldName: string = 'file', extraData?: Record<string, any>): Promise<T> => {
+  uploadFile: async <T>(url: string, file: File, fieldName: string = 'file'): Promise<T> => {
     try {
       const formData = new FormData();
       formData.append(fieldName, file);
-      
-      // Add any extra form data if provided
-      if (extraData) {
-        Object.entries(extraData).forEach(([key, value]) => {
-          formData.append(key, value);
-        });
-      }
       
       const response: AxiosResponse<T> = await apiClient.post(url, formData, {
         headers: {

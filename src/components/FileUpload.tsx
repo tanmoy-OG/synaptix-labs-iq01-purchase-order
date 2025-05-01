@@ -5,13 +5,8 @@ import { UploadResult, usePdfUpload } from "@/hooks/usePdfUpload";
 import { ChangeEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 
-interface FileUploadProps {
-  onUploadSuccess?: (result: UploadResult) => void;
-}
-
-export function FileUpload({ onUploadSuccess }: FileUploadProps) {
+export function FileUpload() {
   const [file, setFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploadPdf, isLoading } = usePdfUpload();
 
@@ -36,23 +31,11 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
       return;
     }
 
-    setIsUploading(true);
-    
-    try {
-      const result = await uploadPdf(file);
-      toast.success("File uploaded successfully");
-      if (onUploadSuccess) {
-        onUploadSuccess(result);
-      }
-      setFile(null); // Reset file after successful upload
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    } catch (error) {
-      console.error("Upload failed:", error);
-      toast.error("Failed to upload file. Please try again.");
-    } finally {
-      setIsUploading(false);
+    await uploadPdf(file);
+
+    setFile(null); // Reset file after successful upload
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -127,7 +110,7 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
       <CardFooter className="flex justify-end">
         <Button 
           onClick={handleUpload} 
-          disabled={!file || isLoading}
+          disabled={isLoading}
         >
           {isLoading ? "Uploading..." : "Process PDF"}
         </Button>
