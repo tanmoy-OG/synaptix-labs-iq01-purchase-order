@@ -9,4 +9,5 @@ export const API_ENDPOINTS = {
   UPLOAD_PDF: `${API_BASE_URL}/upload`,
   CHECK_STATUS: `${API_BASE_URL}/status`,
   DOWNLOAD_EXCEL: `${API_BASE_URL}/download`,
+  SUBMIT_SELECTIONS: `${API_BASE_URL}/submit-selections`,
 }; 

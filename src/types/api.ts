@@ -26,10 +26,21 @@ export interface UploadResponse {
   status: 'processing' | 'completed' | 'failed';
   message: string;
   downloadUrl?: string;
+  extractedData?: ExtractedPdfData;
 }
 
 export interface ErrorResponse {
   message: string;
   error: string;
   status: number;
+}
+
+export interface ExtractedPdfData {
+  header: Record<string, string>;
+  item: Record<string, string>;
+}
+
+export interface SelectedData {
+  headerData: Record<string, string>;
+  itemData: Record<string, string>;
 } 

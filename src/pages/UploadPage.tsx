@@ -2,15 +2,15 @@ import { FileUpload } from '@/components/FileUpload';
 
 export function UploadPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-      <header className="w-full max-w-3xl mb-8 text-center">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 md:p-8">
+      <header className="w-full max-w-4xl mb-8 text-center">
         <h1 className="text-3xl font-bold tracking-tight text-gray-900">Inforium</h1>
         <p className="mt-2 text-lg text-gray-600">
           Extract purchase order data from PDF files
         </p>
       </header>
       
-      <main className="w-full max-w-3xl flex flex-col items-center space-y-8">
+      <main className="w-full max-w-4xl flex flex-col items-center">
         <FileUpload />
       </main>
       

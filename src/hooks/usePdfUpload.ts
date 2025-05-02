@@ -1,6 +1,6 @@
 import api from '@/lib/api/client';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
-import { UploadResponse } from '@/types/api';
+import { ExtractedPdfData, UploadResponse } from '@/types/api';
 import { useState } from 'react';
 import { toast } from "sonner";
 
@@ -10,6 +10,7 @@ export function usePdfUpload() {
   const [isLoading, setIsLoading] = useState(false);
   // const [error, setError] = useState<Error | null>(null);
   const [result, setResult] = useState<UploadResult | null>(null);
+  const [extractedData, setExtractedData] = useState<ExtractedPdfData | null>(null);
 
   const uploadPdf = async (file: File): Promise<UploadResult> => {
     setIsLoading(true);
@@ -24,6 +25,12 @@ export function usePdfUpload() {
       );
       
       setResult(response);
+      
+      // If the response contains extracted data, set it
+      if (response.extractedData) {
+        setExtractedData(response.extractedData);
+      }
+      
       toast.success("File uploaded successfully");
       return response;
     } catch (err) {
@@ -34,6 +41,11 @@ export function usePdfUpload() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const resetData = () => {
+    setResult(null);
+    setExtractedData(null);
   };
 
   // const checkProcessingStatus = async (id: string): Promise<UploadResult> => {
@@ -60,9 +72,11 @@ export function usePdfUpload() {
 
   return {
     uploadPdf,
+    resetData,
     // checkProcessingStatus,
     isLoading,
     // error,
     result,
+    extractedData,
   };
 } 

@@ -1,14 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { UploadResult, usePdfUpload } from "@/hooks/usePdfUpload";
+import { usePdfUpload } from "@/hooks/usePdfUpload";
 import { ChangeEvent, useRef, useState } from "react";
 import { toast } from "sonner";
+import { ResultsDisplay } from "./ResultsDisplay";
 
 export function FileUpload() {
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { uploadPdf, isLoading } = usePdfUpload();
+  const { uploadPdf, isLoading, extractedData, resetData } = usePdfUpload();
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
@@ -55,6 +56,16 @@ export function FileUpload() {
     }
   };
 
+  const handleReset = () => {
+    resetData();
+  };
+
+  // If we have extracted data, show the results display
+  if (extractedData) {
+    return <ResultsDisplay data={extractedData} onReset={handleReset} />;
+  }
+
+  // Otherwise show the file upload
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
