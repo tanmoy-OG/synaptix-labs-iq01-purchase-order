@@ -62,6 +62,8 @@ export function FileUpload() {
 
   // If we have extracted data, show the results display
   if (extractedData) {
+    // console.log("Inside if extractedData is not null");
+    console.log("Extracted data:", extractedData);
     return <ResultsDisplay data={extractedData} onReset={handleReset} />;
   }
 

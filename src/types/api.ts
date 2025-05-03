@@ -21,14 +21,6 @@ export interface ApiResponse<T> {
   status: number;
 }
 
-export interface UploadResponse {
-  id: string;
-  status: 'processing' | 'completed' | 'failed';
-  message: string;
-  downloadUrl?: string;
-  extractedData?: ExtractedPdfData;
-}
-
 export interface ErrorResponse {
   message: string;
   error: string;
@@ -39,6 +31,14 @@ export interface ExtractedPdfData {
   header: Record<string, string>;
   item: Record<string, string>;
 }
+
+// export interface ExtractedPdfData {
+//   id: string;
+//   status: 'processing' | 'completed' | 'failed';
+//   message: string;
+//   downloadUrl?: string;
+//   extractedData?: ExtractedPdfData;
+// }
 
 export interface SelectedData {
   headerData: Record<string, string>;
