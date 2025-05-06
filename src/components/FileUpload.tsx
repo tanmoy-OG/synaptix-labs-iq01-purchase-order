@@ -3,13 +3,18 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { usePdfUpload } from "@/hooks/usePdfUpload";
 import { ChangeEvent, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { ResultsDisplay } from "./ResultsDisplay";
 
+export type UploadMode = "configure" | "extract";
+
 export function FileUpload() {
   const [file, setFile] = useState<File | null>(null);
+  const [selectedMode, setSelectedMode] = useState<UploadMode>("configure");
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { uploadPdf, isLoading, extractedData, resetData } = usePdfUpload();
+  const { uploadPdf, extractPdf, isLoading, extractedData, resetData } = usePdfUpload();
+  const navigate = useNavigate();
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
@@ -32,11 +37,20 @@ export function FileUpload() {
       return;
     }
 
-    await uploadPdf(file);
+    try {
+      if (selectedMode === "configure") {
+        await uploadPdf(file);
+      } else {
+        await extractPdf(file);
+        navigate('/extract-results');
+      }
 
-    setFile(null); // Reset file after successful upload
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      setFile(null); // Reset file after successful upload
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (error) {
+      console.error("Upload failed:", error);
     }
   };
 
@@ -60,10 +74,8 @@ export function FileUpload() {
     resetData();
   };
 
-  // If we have extracted data, show the results display
-  if (extractedData) {
-    // console.log("Inside if extractedData is not null");
-    console.log("Extracted data:", extractedData);
+  // If we have extracted data and in configure mode, show the results display
+  if (extractedData && selectedMode === "configure") {
     return <ResultsDisplay data={extractedData} onReset={handleReset} />;
   }
 
@@ -73,10 +85,10 @@ export function FileUpload() {
       <CardHeader>
         <CardTitle>Upload Purchase Order PDF</CardTitle>
         <CardDescription>
-          Upload a PDF file to extract purchase order data
+          Upload a PDF file to process purchase order data
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
         <div
           className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:bg-gray-50 transition-colors"
           onDragOver={handleDragOver}
@@ -119,13 +131,32 @@ export function FileUpload() {
             onChange={handleFileChange}
           />
         </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Button
+            type="button"
+            variant={selectedMode === "configure" ? "default" : "outline"}
+            className="w-full"
+            onClick={() => setSelectedMode("configure")}
+          >
+            Configure Data Extraction
+          </Button>
+          <Button
+            type="button"
+            variant={selectedMode === "extract" ? "default" : "outline"}
+            className="w-full"
+            onClick={() => setSelectedMode("extract")}
+          >
+            Extract Data
+          </Button>
+        </div>
       </CardContent>
       <CardFooter className="flex justify-end">
         <Button 
           onClick={handleUpload} 
           disabled={isLoading}
         >
-          {isLoading ? "Uploading..." : "Process PDF"}
+          {isLoading ? "Processing..." : "Process PDF"}
         </Button>
       </CardFooter>
     </Card>

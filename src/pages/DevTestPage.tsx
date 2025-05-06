@@ -3,9 +3,10 @@ import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { Button } from "@/components/ui/button";
 import { mockExtractedData } from "@/lib/mockData";
 import { useState } from "react";
+import { ExtractResultsPage } from "./ExtractResultsPage";
 
 export function DevTestPage() {
-  const [showMock, setShowMock] = useState(false);
+  const [activeComponent, setActiveComponent] = useState<"upload" | "results" | "extract-results">("upload");
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 md:p-8">
@@ -15,30 +16,40 @@ export function DevTestPage() {
           Development testing page for components
         </p>
         
-        <div className="flex space-x-4">
+        <div className="flex flex-wrap gap-2 justify-center">
           <Button 
-            onClick={() => setShowMock(false)} 
-            variant={!showMock ? "default" : "outline"}
+            onClick={() => setActiveComponent("upload")} 
+            variant={activeComponent === "upload" ? "default" : "outline"}
           >
-            Show Upload Component
+            Upload Component
           </Button>
           <Button 
-            onClick={() => setShowMock(true)} 
-            variant={showMock ? "default" : "outline"}
+            onClick={() => setActiveComponent("results")} 
+            variant={activeComponent === "results" ? "default" : "outline"}
           >
-            Show Results Component
+            Results Display
+          </Button>
+          <Button 
+            onClick={() => setActiveComponent("extract-results")} 
+            variant={activeComponent === "extract-results" ? "default" : "outline"}
+          >
+            Extract Results
           </Button>
         </div>
       </header>
       
       <main className="w-full max-w-4xl flex flex-col items-center">
-        {showMock ? (
+        {activeComponent === "upload" && (
+          <FileUpload />
+        )}
+        {activeComponent === "results" && (
           <ResultsDisplay 
             data={mockExtractedData} 
-            onReset={() => setShowMock(false)}
+            onReset={() => setActiveComponent("upload")}
           />
-        ) : (
-          <FileUpload />
+        )}
+        {activeComponent === "extract-results" && (
+          <ExtractResultsPage />
         )}
       </main>
       

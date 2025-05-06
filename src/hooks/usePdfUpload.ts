@@ -15,14 +15,20 @@ export function usePdfUpload() {
 
     try {
       // Use our API client to upload the file
-      // console.log("Uploading file:", file);
-      const response = await api.uploadFile<UploadResult>(
+      const formData = new FormData();
+      formData.append('pdf_file', file);
+      formData.append('mode', 'configure');
+      
+      const response = await api.post<UploadResult>(
         API_ENDPOINTS.UPLOAD_PDF,
-        file,
-        'pdf_file'
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
       );
 
-      // console.log("Upload response:", response);
       setExtractedData(response);
       toast.success('File uploaded successfully');
       return response;
@@ -36,12 +42,44 @@ export function usePdfUpload() {
     }
   };
 
+  const extractPdf = async (file: File): Promise<UploadResult> => {
+    setIsLoading(true);
+
+    try {
+      // Use our API client to upload the file for extraction
+      const formData = new FormData();
+      formData.append('pdf_file', file);
+      formData.append('mode', 'extract');
+      
+      const response = await api.post<UploadResult>(
+        API_ENDPOINTS.UPLOAD_PDF,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      toast.success('Data extracted successfully');
+      return response;
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('An unknown error occurred');
+      console.error('Extraction failed:', error);
+      toast.error('Failed to extract data. Please try again.');
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const resetData = () => {
     setExtractedData(null);
   };
 
   return {
     uploadPdf,
+    extractPdf,
     resetData,
     isLoading,
     extractedData,

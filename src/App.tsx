@@ -1,6 +1,8 @@
 import { Toaster } from '@/components/ui/sonner';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { DevTestPage } from './pages/DevTestPage';
+import { ExtractResultsPage } from './pages/ExtractResultsPage';
 import { UploadPage } from './pages/UploadPage';
 
 // Create a client
@@ -12,12 +14,17 @@ const isDev = import.meta.env.DEV;
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      {isDev && import.meta.env.VITE_ENABLE_TEST_PAGE === "true" ? (
-        <DevTestPage />
-      ) : (
-        <UploadPage />
-      )}
-      <Toaster position="top-right" />
+      <BrowserRouter>
+        {isDev && import.meta.env.VITE_ENABLE_TEST_PAGE === "true" ? (
+          <DevTestPage />
+        ) : (
+          <Routes>
+            <Route path="/" element={<UploadPage />} />
+            <Route path="/extract-results" element={<ExtractResultsPage />} />
+          </Routes>
+        )}
+        <Toaster position="top-right" />
+      </BrowserRouter>
     </QueryClientProvider>
   );
 }
