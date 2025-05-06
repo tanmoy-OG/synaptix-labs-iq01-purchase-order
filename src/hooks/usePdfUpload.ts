@@ -9,7 +9,7 @@ export type UploadResult = ExtractedPdfData;
 export function usePdfUpload() {
   const [isLoading, setIsLoading] = useState(false);
 
-  const uploadPdf = async (file: File): Promise<UploadResult> => {
+  const configurePdf = async (file: File): Promise<UploadResult> => {
     setIsLoading(true);
 
     try {
@@ -28,12 +28,12 @@ export function usePdfUpload() {
         }
       );
 
-      toast.success('File uploaded successfully');
+      toast.success('Data configuration initiated successfully');
       return response;
     } catch (err) {
       const error = err instanceof Error ? err : new Error('An unknown error occurred');
-      console.error('Upload failed:', error);
-      toast.error('Failed to upload file. Please try again.');
+      console.error('Configuration upload failed:', error);
+      toast.error('Failed to process file for configuration. Please try again.');
       throw error;
     } finally {
       setIsLoading(false);
@@ -72,7 +72,7 @@ export function usePdfUpload() {
   };
 
   return {
-    uploadPdf,
+    configurePdf,
     extractPdf,
     isLoading,
   };
