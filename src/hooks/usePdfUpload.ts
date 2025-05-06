@@ -8,7 +8,6 @@ export type UploadResult = ExtractedPdfData;
 
 export function usePdfUpload() {
   const [isLoading, setIsLoading] = useState(false);
-  const [extractedData, setExtractedData] = useState<ExtractedPdfData | null>(null);
 
   const uploadPdf = async (file: File): Promise<UploadResult> => {
     setIsLoading(true);
@@ -29,7 +28,6 @@ export function usePdfUpload() {
         }
       );
 
-      setExtractedData(response);
       toast.success('File uploaded successfully');
       return response;
     } catch (err) {
@@ -73,15 +71,9 @@ export function usePdfUpload() {
     }
   };
 
-  const resetData = () => {
-    setExtractedData(null);
-  };
-
   return {
     uploadPdf,
     extractPdf,
-    resetData,
     isLoading,
-    extractedData,
   };
 }

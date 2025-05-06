@@ -1,6 +1,7 @@
 import { Toaster } from '@/components/ui/sonner';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { DataConfigurationPage } from './pages/DataConfigurationPage';
 import { DevTestPage } from './pages/DevTestPage';
 import { ExtractResultsPage } from './pages/ExtractResultsPage';
 import { UploadPage } from './pages/UploadPage';
@@ -20,6 +21,7 @@ function App() {
         ) : (
           <Routes>
             <Route path="/" element={<UploadPage />} />
+            <Route path="/data-configuration" element={<DataConfigurationPage />} />
             <Route path="/extract-results" element={<ExtractResultsPage />} />
           </Routes>
         )}

@@ -1,12 +1,20 @@
 import { FileUpload } from "@/components/FileUpload";
-import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { Button } from "@/components/ui/button";
 import { mockExtractedData } from "@/lib/mockData";
 import { useState } from "react";
+import { DataConfigurationPage } from "./DataConfigurationPage";
 import { ExtractResultsPage } from "./ExtractResultsPage";
 
 export function DevTestPage() {
-  const [activeComponent, setActiveComponent] = useState<"upload" | "results" | "extract-results">("upload");
+  const [activeComponent, setActiveComponent] = useState<"upload" | "data-config" | "extract-results">("upload");
+
+  // Configure react router mock location state for DataConfigurationPage
+  if (activeComponent === "data-config") {
+    // Mock the location object that would be passed by react-router
+    (window as any).history.replaceState({
+      state: { data: mockExtractedData }
+    }, '');
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 md:p-8">
@@ -24,10 +32,10 @@ export function DevTestPage() {
             Upload Component
           </Button>
           <Button 
-            onClick={() => setActiveComponent("results")} 
-            variant={activeComponent === "results" ? "default" : "outline"}
+            onClick={() => setActiveComponent("data-config")} 
+            variant={activeComponent === "data-config" ? "default" : "outline"}
           >
-            Results Display
+            Data Configuration
           </Button>
           <Button 
             onClick={() => setActiveComponent("extract-results")} 
@@ -42,11 +50,8 @@ export function DevTestPage() {
         {activeComponent === "upload" && (
           <FileUpload />
         )}
-        {activeComponent === "results" && (
-          <ResultsDisplay 
-            data={mockExtractedData} 
-            onReset={() => setActiveComponent("upload")}
-          />
+        {activeComponent === "data-config" && (
+          <DataConfigurationPage />
         )}
         {activeComponent === "extract-results" && (
           <ExtractResultsPage />

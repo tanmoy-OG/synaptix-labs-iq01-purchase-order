@@ -5,7 +5,6 @@ import { usePdfUpload } from "@/hooks/usePdfUpload";
 import { ChangeEvent, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { ResultsDisplay } from "./ResultsDisplay";
 
 export type UploadMode = "configure" | "extract";
 
@@ -13,7 +12,7 @@ export function FileUpload() {
   const [file, setFile] = useState<File | null>(null);
   const [selectedMode, setSelectedMode] = useState<UploadMode>("configure");
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { uploadPdf, extractPdf, isLoading, extractedData, resetData } = usePdfUpload();
+  const { uploadPdf, extractPdf, isLoading } = usePdfUpload();
   const navigate = useNavigate();
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -39,7 +38,9 @@ export function FileUpload() {
 
     try {
       if (selectedMode === "configure") {
-        await uploadPdf(file);
+        const data = await uploadPdf(file);
+        // Pass the extracted data to the data configuration page
+        navigate('/data-configuration', { state: { data } });
       } else {
         await extractPdf(file);
         navigate('/extract-results');
@@ -70,16 +71,6 @@ export function FileUpload() {
     }
   };
 
-  const handleReset = () => {
-    resetData();
-  };
-
-  // If we have extracted data and in configure mode, show the results display
-  if (extractedData && selectedMode === "configure") {
-    return <ResultsDisplay data={extractedData} onReset={handleReset} />;
-  }
-
-  // Otherwise show the file upload
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
