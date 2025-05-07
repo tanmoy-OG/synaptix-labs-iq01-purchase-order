@@ -72,6 +72,7 @@ export function DevTestPage() {
 
   const handleSaveConfig = async (config: FieldConfigurationData) => {
     setIsSubmitting(true);
+    console.log('Field Configuration:', config);
     
     // Simulate API call
     setTimeout(() => {

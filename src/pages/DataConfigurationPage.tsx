@@ -1,8 +1,6 @@
 import { FieldConfigurationView } from "@/components/FieldConfigurationView";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import api from "@/lib/api/client";
-import { API_ENDPOINTS } from "@/lib/api/endpoints";
 import { cn } from "@/lib/utils";
 import { ConfigurePdfResponse, ExtractedPdfData, FieldConfigurationData } from "@/types/api";
 import { CheckCircle2 } from "lucide-react";
