@@ -1,79 +1,102 @@
+import { FieldConfigurationView } from "@/components/FieldConfigurationView";
 import { FileUpload } from "@/components/FileUpload";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { mockExtractedData } from "@/lib/mockData";
+import { mockConfigureResponse } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
-import { SelectedData } from "@/types/api";
+import { ExtractedPdfData, FieldConfigurationData } from "@/types/api";
 import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ExtractResultsPage } from "./ExtractResultsPage";
 
 export function DevTestPage() {
-  const [activeComponent, setActiveComponent] = useState<"upload" | "data-config" | "extract-results">("upload");
-  const [selectedData, setSelectedData] = useState<SelectedData>({
-    headerData: {},
-    itemData: {},
-  });
+  const [activeComponent, setActiveComponent] = useState<"upload" | "data-config" | "extract-results" | "field-config">("upload");
+  const [selectedData, setSelectedData] = useState<ExtractedPdfData | null>(null);
+  const [fieldConfig, setFieldConfig] = useState<FieldConfigurationData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const toggleHeaderSelection = (key: string, value: string) => {
-    setSelectedData((prev) => {
-      const headerData = { ...prev.headerData };
+  const toggleHeaderSelection = (key: string) => {
+    if (!fieldConfig) return;
+
+    setFieldConfig((prev) => {
+      if (!prev) return prev;
+
+      const headerConfig = { ...prev.header };
+      const fieldId = Object.entries(headerConfig).find(([, field]) => field.fieldname === key)?.[0];
       
-      if (headerData[key]) {
-        delete headerData[key];
-      } else {
-        headerData[key] = value;
+      if (fieldId) {
+        headerConfig[fieldId] = {
+          ...headerConfig[fieldId],
+          selected: !headerConfig[fieldId].selected
+        };
       }
       
-      return { ...prev, headerData };
+      return { ...prev, header: headerConfig };
     });
   };
 
-  const toggleItemSelection = (key: string, value: string) => {
-    setSelectedData((prev) => {
-      const itemData = { ...prev.itemData };
+  const toggleItemSelection = (key: string) => {
+    if (!fieldConfig) return;
+
+    setFieldConfig((prev) => {
+      if (!prev) return prev;
+
+      const itemConfig = { ...prev.item };
+      const fieldId = Object.entries(itemConfig).find(([, field]) => field.fieldname === key)?.[0];
       
-      if (itemData[key]) {
-        delete itemData[key];
-      } else {
-        itemData[key] = value;
+      if (fieldId) {
+        itemConfig[fieldId] = {
+          ...itemConfig[fieldId],
+          selected: !itemConfig[fieldId].selected
+        };
       }
       
-      return { ...prev, itemData };
+      return { ...prev, item: itemConfig };
     });
   };
 
   const handleSubmit = () => {
-    if (Object.keys(selectedData.headerData).length === 0 && 
-        Object.keys(selectedData.itemData).length === 0) {
+    if (!fieldConfig) return;
+
+    const hasSelectedFields = Object.values(fieldConfig.header).some(field => field.selected) ||
+                            Object.values(fieldConfig.item).some(field => field.selected);
+
+    if (!hasSelectedFields) {
       toast.error("Please select at least one field");
       return;
     }
 
+    setActiveComponent("field-config");
+  };
+
+  const handleSaveConfig = async (config: FieldConfigurationData) => {
     setIsSubmitting(true);
     
     // Simulate API call
     setTimeout(() => {
-      toast.success("Data submitted successfully");
+      setFieldConfig(config);
+      toast.success("Configuration saved successfully");
       setIsSubmitting(false);
-      setSelectedData({
-        headerData: {},
-        itemData: {},
-      });
+      setActiveComponent("extract-results");
     }, 1000);
   };
 
   const handleReset = () => {
     setActiveComponent("upload");
-    setSelectedData({
-      headerData: {},
-      itemData: {},
-    });
+    setSelectedData(null);
+    setFieldConfig(null);
+  };
+
+  const handleMockData = () => {
+    setSelectedData(mockConfigureResponse.extractedData);
+    setFieldConfig(mockConfigureResponse.fieldConfig);
+    setActiveComponent("data-config");
   };
 
   const renderDataConfiguration = () => {
+    if (!selectedData || !fieldConfig) return null;
+
     return (
       <div className="w-full max-w-4xl">
         <div className="space-y-8 w-full">
@@ -81,32 +104,37 @@ export function DevTestPage() {
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Document Header</h2>
               <div className="text-sm text-gray-500">
-                {Object.keys(selectedData.headerData).length} item(s) selected
+                {Object.values(fieldConfig.header).filter(field => field.selected).length} item(s) selected
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {Object.entries(mockExtractedData.header).map(([key, value]) => (
-                <Card 
-                  key={key}
-                  className={cn(
-                    "cursor-pointer transition-all hover:border-primary", 
-                    selectedData.headerData[key] ? "border-2 border-primary bg-primary/5 shadow-md" : ""
-                  )}
-                  onClick={() => toggleHeaderSelection(key, value)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="font-medium text-sm text-gray-500">{key}</div>
-                        <div className="text-lg font-semibold mt-1">{value}</div>
+              {Object.entries(selectedData.header).map(([key, value]) => {
+                const fieldId = Object.entries(fieldConfig.header).find(([, field]) => field.fieldname === key)?.[0];
+                const isSelected = fieldId ? fieldConfig.header[fieldId].selected : false;
+
+                return (
+                  <Card 
+                    key={key}
+                    className={cn(
+                      "cursor-pointer transition-all hover:border-primary", 
+                      isSelected ? "border-2 border-primary bg-primary/5 shadow-md" : ""
+                    )}
+                    onClick={() => toggleHeaderSelection(key)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="font-medium text-sm text-gray-500">{key}</div>
+                          <div className="text-lg font-semibold mt-1">{value}</div>
+                        </div>
+                        {isSelected && (
+                          <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                        )}
                       </div>
-                      {selectedData.headerData[key] && (
-                        <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </div>
 
@@ -114,32 +142,37 @@ export function DevTestPage() {
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Line Items</h2>
               <div className="text-sm text-gray-500">
-                {Object.keys(selectedData.itemData).length} item(s) selected
+                {Object.values(fieldConfig.item).filter(field => field.selected).length} item(s) selected
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {Object.entries(mockExtractedData.item).map(([key, value]) => (
-                <Card 
-                  key={key}
-                  className={cn(
-                    "cursor-pointer transition-all hover:border-primary", 
-                    selectedData.itemData[key] ? "border-2 border-primary bg-primary/5 shadow-md" : ""
-                  )}
-                  onClick={() => toggleItemSelection(key, value)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="font-medium text-sm text-gray-500">{key}</div>
-                        <div className="text-lg font-semibold mt-1">{value}</div>
+              {Object.entries(selectedData.item).map(([key, value]) => {
+                const fieldId = Object.entries(fieldConfig.item).find(([, field]) => field.fieldname === key)?.[0];
+                const isSelected = fieldId ? fieldConfig.item[fieldId].selected : false;
+
+                return (
+                  <Card 
+                    key={key}
+                    className={cn(
+                      "cursor-pointer transition-all hover:border-primary", 
+                      isSelected ? "border-2 border-primary bg-primary/5 shadow-md" : ""
+                    )}
+                    onClick={() => toggleItemSelection(key)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="font-medium text-sm text-gray-500">{key}</div>
+                          <div className="text-lg font-semibold mt-1">{value}</div>
+                        </div>
+                        {isSelected && (
+                          <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                        )}
                       </div>
-                      {selectedData.itemData[key] && (
-                        <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </div>
 
@@ -148,7 +181,7 @@ export function DevTestPage() {
               Upload Another PDF
             </Button>
             <Button onClick={handleSubmit} disabled={isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Submit Selected Data"}
+              {isSubmitting ? "Submitting..." : "Configure Selected Fields"}
             </Button>
           </div>
         </div>
@@ -183,6 +216,12 @@ export function DevTestPage() {
           >
             Extract Results
           </Button>
+          <Button 
+            onClick={handleMockData}
+            variant="outline"
+          >
+            Load Mock Data
+          </Button>
         </div>
       </header>
       
@@ -193,6 +232,19 @@ export function DevTestPage() {
           </div>
         )}
         {activeComponent === "data-config" && renderDataConfiguration()}
+        {activeComponent === "field-config" && fieldConfig && (
+          <div className="space-y-6">
+            <header className="text-center mb-8">
+              <h2 className="text-2xl font-bold">Configure Field Mapping</h2>
+              <p className="text-gray-600 mt-2">Configure how each field should be processed</p>
+            </header>
+            <FieldConfigurationView
+              fieldConfig={fieldConfig}
+              onSave={handleSaveConfig}
+              onCancel={() => setActiveComponent("data-config")}
+            />
+          </div>
+        )}
         {activeComponent === "extract-results" && (
           <ExtractResultsPage />
         )}

@@ -43,4 +43,22 @@ export interface ExtractedPdfData {
 export interface SelectedData {
   headerData: Record<string, string>;
   itemData: Record<string, string>;
+}
+
+export interface FieldConfig {
+  fieldname: string;
+  label: string;
+  logic: "0" | "1" | "2";
+  prompt: string;
+  selected: boolean;
+}
+
+export interface FieldConfigurationData {
+  header: Record<string, FieldConfig>;
+  item: Record<string, FieldConfig>;
+}
+
+export interface ConfigurePdfResponse {
+  extractedData: ExtractedPdfData;
+  fieldConfig: FieldConfigurationData;
 } 

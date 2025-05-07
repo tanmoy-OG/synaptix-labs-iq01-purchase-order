@@ -1,15 +1,16 @@
 import api from '@/lib/api/client';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
-import { ExtractedPdfData } from '@/types/api';
+import { ConfigurePdfResponse, ExtractedPdfData } from '@/types/api';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 export type UploadResult = ExtractedPdfData;
+export type ConfigureResult = ConfigurePdfResponse;
 
 export function usePdfUpload() {
   const [isLoading, setIsLoading] = useState(false);
 
-  const configurePdf = async (file: File): Promise<UploadResult> => {
+  const configurePdf = async (file: File): Promise<ConfigureResult> => {
     setIsLoading(true);
 
     try {
@@ -18,7 +19,7 @@ export function usePdfUpload() {
       formData.append('pdf_file', file);
       formData.append('mode', 'configure');
       
-      const response = await api.post<UploadResult>(
+      const response = await api.post<ConfigureResult>(
         API_ENDPOINTS.UPLOAD_PDF,
         formData,
         {
