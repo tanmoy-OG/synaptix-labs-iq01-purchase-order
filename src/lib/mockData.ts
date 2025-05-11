@@ -1,124 +1,113 @@
-import { ConfigurePdfResponse, ExtractedPdfData, FieldConfigurationData } from "@/types/api";
+import { ConfigurePdfResponse } from "@/types/api";
 
-export const mockExtractedData: ExtractedPdfData = {
-  header: {
-    "Bestellnr": "10013",
-    "Bedat": "23.05.2020",
-    "Tel": "+49 123 456789",
-    "Info": "Delivery expected by 30.05.2020",
-    "Lieferant": "ABC Suppliers Ltd.",
-    "Lieferadresse": "Main Warehouse, 123 Business St.",
-    "Zahlungsbedingungen": "Net 30"
-  },
-  item: {
-    "Artikelnummer": "10",
-    "Beschreibung": "Jol er balti",
-    "Menge": "100", 
-    "Preis": "50",
-    "Einheit": "EA",
-    "Gesamt": "5000"
-  }
-};
-
-export const mockFieldConfig: FieldConfigurationData = {
+export const mockConfigureResponse: ConfigurePdfResponse = {
+  name: "",
   header: {
     "0": {
       fieldname: "Bestellnr",
-      label: "PO Number",
-      logic: "1",
+      label: "",
+      logic: "0",
       prompt: "",
-      selected: true
+      selected: false,
+      first: "10013"
     },
     "1": {
       fieldname: "Bedat",
-      label: "PO Date",
-      logic: "1",
+      label: "",
+      logic: "0",
       prompt: "",
-      selected: true
+      selected: false,
+      first: "23.05.2020"
     },
     "2": {
       fieldname: "Tel",
       label: "",
       logic: "0",
       prompt: "",
-      selected: false
+      selected: false,
+      first: "+49 123 456789"
     },
     "3": {
       fieldname: "Info",
-      label: "Delivery Date",
-      logic: "2",
-      prompt: "Derive the date from this field",
-      selected: true
+      label: "",
+      logic: "0",
+      prompt: "",
+      selected: false,
+      first: "Delivery expected by 30.05.2020"
     },
     "4": {
       fieldname: "Lieferant",
-      label: "Vendor",
-      logic: "1",
+      label: "",
+      logic: "0",
       prompt: "",
-      selected: true
+      selected: false,
+      first: "ABC Suppliers Ltd."
     },
     "5": {
       fieldname: "Lieferadresse",
-      label: "Ship To",
-      logic: "1",
+      label: "",
+      logic: "0",
       prompt: "",
-      selected: true
+      selected: false,
+      first: "Main Warehouse, 123 Business St."
     },
     "6": {
       fieldname: "Zahlungsbedingungen",
-      label: "Payment Terms",
-      logic: "1",
+      label: "",
+      logic: "0",
       prompt: "",
-      selected: true
+      selected: false,
+      first: "Net 30"
     }
   },
   item: {
     "0": {
       fieldname: "Artikelnummer",
-      label: "Item No.",
-      logic: "1",
+      label: "",
+      logic: "0",
       prompt: "",
-      selected: true
+      selected: false,
+      first: "10"
     },
     "1": {
       fieldname: "Beschreibung",
-      label: "Item Desc",
-      logic: "1",
+      label: "",
+      logic: "0",
       prompt: "",
-      selected: true
+      selected: false,
+      first: "Jol er balti"
     },
     "2": {
       fieldname: "Menge",
-      label: "Qty",
-      logic: "1",
+      label: "",
+      logic: "0",
       prompt: "",
-      selected: true
+      selected: false,
+      first: "100"
     },
     "3": {
       fieldname: "Preis",
-      label: "Price",
-      logic: "1",
+      label: "",
+      logic: "0",
       prompt: "",
-      selected: true
+      selected: false,
+      first: "50"
     },
     "4": {
       fieldname: "Einheit",
-      label: "UOM",
-      logic: "1",
+      label: "",
+      logic: "0",
       prompt: "",
-      selected: true
+      selected: false,
+      first: "EA"
     },
     "5": {
       fieldname: "Gesamt",
-      label: "Total",
-      logic: "1",
+      label: "",
+      logic: "0",
       prompt: "",
-      selected: true
+      selected: false,
+      first: "5000"
     }
   }
-};
-
-export const mockConfigureResponse: ConfigurePdfResponse = {
-  extractedData: mockExtractedData,
-  fieldConfig: mockFieldConfig
 }; 

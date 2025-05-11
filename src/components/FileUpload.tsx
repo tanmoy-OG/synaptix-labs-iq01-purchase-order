@@ -1,195 +1,86 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { usePdfUpload } from "@/hooks/usePdfUpload";
-import { cn } from "@/lib/utils";
-import { CheckCircle2, FileText } from "lucide-react";
-import { ChangeEvent, useRef, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-export type UploadMode = "configure" | "extract";
-
 export function FileUpload() {
-  const [file, setFile] = useState<File | null>(null);
-  const [selectedMode, setSelectedMode] = useState<UploadMode | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { configurePdf, extractPdf, isLoading } = usePdfUpload();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const { configurePdf } = usePdfUpload();
   const navigate = useNavigate();
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0] || null;
-    
-    if (selectedFile) {
-      // Check if file is a PDF
-      if (!selectedFile.type.includes("pdf")) {
-        toast.error("Please upload a PDF file");
-        return;
-      }
-      
-      setFile(selectedFile);
-      toast.success(`File "${selectedFile.name}" selected`);
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
     }
   };
 
-  const handleUpload = async () => {
-    if (!file) {
+  const handleConfigure = async () => {
+    if (!selectedFile) {
       toast.error("Please select a file first");
       return;
     }
 
-    if (!selectedMode) {
-      toast.error("Please select an option: Configure Data Extraction or Extract Data");
-      return;
-    }
-
+    setIsUploading(true);
     try {
-      if (selectedMode === "configure") {
-        const data = await configurePdf(file);
-        // Pass the extracted data to the data configuration page
-        navigate('/data-configuration', { state: { data } });
-      } else {
-        await extractPdf(file);
-        navigate('/extract-results');
-      }
-
-      setFile(null); // Reset file after successful upload
-      setSelectedMode(null); // Reset mode selection
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      const config = await configurePdf(selectedFile);
+      navigate('/data-configuration', { state: { data: config } });
     } catch (error) {
-      console.error("Upload failed:", error);
+      console.error('Failed to configure PDF:', error);
+      toast.error('Failed to process file. Please try again.');
+    } finally {
+      setIsUploading(false);
     }
   };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    
-    const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile && droppedFile.type.includes("pdf")) {
-      setFile(droppedFile);
-      toast.success(`File "${droppedFile.name}" selected`);
-    } else {
-      toast.error("Please upload a PDF file");
-    }
-  };
-
-  // Common option button styles
-  const optionButtonClasses = (mode: UploadMode) => cn(
-    "border rounded-lg p-4 h-[60px] cursor-pointer transition-all hover:border-primary",
-    selectedMode === mode 
-      ? "border-2 border-primary bg-primary/5 shadow-sm" 
-      : "border-dashed border-gray-300"
-  );
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle>Upload Purchase Order PDF</CardTitle>
-        <CardDescription>
-          Upload a PDF file to process purchase order data
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div
-          className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:bg-gray-50 transition-colors h-[160px] flex flex-col items-center justify-center"
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          {file ? (
-            <div className="flex flex-col items-center space-y-2">
-              <FileText className="h-10 w-10 text-primary" />
-              <div className="text-sm font-medium text-primary truncate max-w-[280px]">
-                {file.name}
+    <div className="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <h2 className="text-xl font-semibold text-center">Upload PDF</h2>
+          <p className="text-sm text-gray-500 text-center">
+            Select a PDF file to configure data extraction
+          </p>
               </div>
-              <div className="text-xs text-gray-500">
-                Click to change file
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <div className="flex justify-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-10 w-10 text-gray-400"
-                >
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="17 8 12 3 7 8" />
-                  <line x1="12" y1="3" x2="12" y2="15" />
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-center w-full">
+            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                <svg className="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
                 </svg>
+                <p className="mb-2 text-sm text-gray-500">
+                  <span className="font-semibold">Click to upload</span> or drag and drop
+                </p>
+                <p className="text-xs text-gray-500">PDF files only</p>
               </div>
-              <div className="text-sm font-medium">
-                Drag & drop your PDF here or click to browse
+              <input
+                type="file"
+                className="hidden"
+                accept=".pdf"
+                onChange={handleFileChange}
+              />
+            </label>
               </div>
-              <div className="text-xs text-gray-500">
-                Supports: PDF files up to 10MB
-              </div>
+
+          {selectedFile && (
+            <div className="text-sm text-gray-500 text-center">
+              Selected file: {selectedFile.name}
             </div>
           )}
-          <Input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-        </div>
 
-        <div className="space-y-2">
-          <p className="text-sm text-gray-500 mb-2">Select an option:</p>
-          <div className="grid grid-cols-2 gap-4">
-            <div 
-              className={optionButtonClasses("configure")}
-              onClick={() => setSelectedMode("configure")}
-            >
-              <div className="flex items-center justify-between w-full h-full">
-                <span className="font-medium">Configure Data</span>
-                {selectedMode === "configure" ? (
-                  <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                ) : (
-                  <div className="w-5"></div>
-                )}
-              </div>
-            </div>
-            <div 
-              className={optionButtonClasses("extract")}
-              onClick={() => setSelectedMode("extract")}
-            >
-              <div className="flex items-center justify-between w-full h-full">
-                <span className="font-medium">Extract Data</span>
-                {selectedMode === "extract" ? (
-                  <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                ) : (
-                  <div className="w-5"></div>
-                )}
-              </div>
+          <Button
+            className="w-full"
+            onClick={handleConfigure}
+            disabled={!selectedFile || isUploading}
+          >
+            {isUploading ? "Processing..." : "Configure"}
+          </Button>
             </div>
           </div>
         </div>
-      </CardContent>
-      <CardFooter className="flex justify-end">
-        <Button 
-          onClick={handleUpload} 
-          disabled={isLoading}
-          className="bg-primary hover:bg-primary/90"
-        >
-          {isLoading ? "Processing..." : "Process PDF"}
-        </Button>
-      </CardFooter>
-    </Card>
   );
 } 

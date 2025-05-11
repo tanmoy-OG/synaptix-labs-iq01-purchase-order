@@ -4,17 +4,58 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { FieldConfig, FieldConfigurationData } from "@/types/api";
-import { useState } from "react";
+import { ConfigurePdfResponse, FieldConfig } from "@/types/api";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+
+// Dialog components
+const Dialog = ({ open, onOpenChange, children }: { open: boolean; onOpenChange: (open: boolean) => void; children: React.ReactNode }) => {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center" onClick={() => onOpenChange(false)}>
+      <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-4" onClick={e => e.stopPropagation()}>
+        {children}
+      </div>
+    </div>
+  );
+};
+
+const DialogContent = ({ children }: { children: React.ReactNode }) => (
+  <div className="p-6">{children}</div>
+);
+
+const DialogHeader = ({ children }: { children: React.ReactNode }) => (
+  <div className="mb-4">{children}</div>
+);
+
+const DialogTitle = ({ children }: { children: React.ReactNode }) => (
+  <h2 className="text-lg font-semibold">{children}</h2>
+);
+
+const DialogDescription = ({ children }: { children: React.ReactNode }) => (
+  <p className="text-sm text-gray-500 mt-1">{children}</p>
+);
+
+const DialogFooter = ({ children }: { children: React.ReactNode }) => (
+  <div className="flex justify-end space-x-2 mt-6">{children}</div>
+);
 
 interface FieldConfigurationViewProps {
-  fieldConfig: FieldConfigurationData;
-  onSave: (config: FieldConfigurationData) => void;
+  fieldConfig: ConfigurePdfResponse;
+  onSave: (config: ConfigurePdfResponse) => void;
   onCancel: () => void;
 }
 
 export function FieldConfigurationView({ fieldConfig, onSave, onCancel }: FieldConfigurationViewProps) {
-  const [config, setConfig] = useState<FieldConfigurationData>(fieldConfig);
+  const [config, setConfig] = useState<ConfigurePdfResponse>(fieldConfig);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [name, setConfigName] = useState(fieldConfig.name);
+
+  // Update local state when prop changes
+  useEffect(() => {
+    setConfig(fieldConfig);
+    setConfigName(fieldConfig.name);
+  }, [fieldConfig]);
 
   const handleFieldChange = (
     section: "header" | "item",
@@ -34,13 +75,25 @@ export function FieldConfigurationView({ fieldConfig, onSave, onCancel }: FieldC
     }));
   };
 
+  const handleSaveClick = () => {
+    setShowSaveDialog(true);
+  };
+
+  const handleSaveConfirm = () => {
+    if (!name.trim()) {
+      toast.error("Please enter a configuration name");
+      return;
+    }
+    
+    onSave({
+      ...config,
+      name: name.trim()
+    });
+    setShowSaveDialog(false);
+  };
+
   const renderFieldConfig = (section: "header" | "item", fieldId: string, field: FieldConfig) => {
     if (!field.selected) return null;
-
-    // If the field's logic is 0, set it to 1 by default since 0 is reserved for unselected fields
-    if (field.logic === "0") {
-      handleFieldChange(section, fieldId, "logic", "1");
-    }
 
     return (
       <Card key={fieldId} className="mb-4">
@@ -133,10 +186,40 @@ export function FieldConfigurationView({ fieldConfig, onSave, onCancel }: FieldC
         <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button onClick={() => onSave(config)}>
+        <Button onClick={handleSaveClick}>
           Save Configuration
         </Button>
       </div>
+
+      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save Configuration</DialogTitle>
+            <DialogDescription>
+              Enter a name for this configuration. This will help you identify and reuse this configuration later.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Configuration Name</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setConfigName(e.target.value)}
+                placeholder="Enter configuration name"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSaveDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveConfirm}>
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 } 

@@ -51,6 +51,7 @@ export interface FieldConfig {
   logic: "0" | "1" | "2";
   prompt: string;
   selected: boolean;
+  first: string;
 }
 
 export interface FieldConfigurationData {
@@ -59,6 +60,7 @@ export interface FieldConfigurationData {
 }
 
 export interface ConfigurePdfResponse {
-  extractedData: ExtractedPdfData;
-  fieldConfig: FieldConfigurationData;
+  name: string;
+  header: Record<string, FieldConfig>;
+  item: Record<string, FieldConfig>;
 } 
