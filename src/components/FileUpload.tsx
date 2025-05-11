@@ -26,13 +26,21 @@ export function FileUpload() {
     setIsUploading(true);
     try {
       const config = await configurePdf(selectedFile);
-      navigate('/data-configuration', { state: { data: config } });
+      navigate('/data-configuration', { state: { data: config, file: selectedFile } });
     } catch (error) {
       console.error('Failed to configure PDF:', error);
       toast.error('Failed to process file. Please try again.');
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleExtract = () => {
+    if (!selectedFile) {
+      toast.error("Please select a file first");
+      return;
+    }
+    navigate('/select-configuration', { state: { file: selectedFile } });
   };
 
   return (
@@ -43,7 +51,7 @@ export function FileUpload() {
           <p className="text-sm text-gray-500 text-center">
             Select a PDF file to configure data extraction
           </p>
-              </div>
+        </div>
 
         <div className="space-y-4">
           <div className="flex items-center justify-center w-full">
@@ -64,7 +72,7 @@ export function FileUpload() {
                 onChange={handleFileChange}
               />
             </label>
-              </div>
+          </div>
 
           {selectedFile && (
             <div className="text-sm text-gray-500 text-center">
@@ -72,15 +80,25 @@ export function FileUpload() {
             </div>
           )}
 
-          <Button
-            className="w-full"
-            onClick={handleConfigure}
-            disabled={!selectedFile || isUploading}
-          >
-            {isUploading ? "Processing..." : "Configure"}
-          </Button>
-            </div>
+          <div className="flex gap-4">
+            <Button
+              className="flex-1"
+              onClick={handleConfigure}
+              disabled={!selectedFile || isUploading}
+            >
+              {isUploading ? "Processing..." : "Configure"}
+            </Button>
+            <Button
+              className="flex-1"
+              variant="outline"
+              onClick={handleExtract}
+              disabled={!selectedFile || isUploading}
+            >
+              Extract PDF
+            </Button>
           </div>
         </div>
+      </div>
+    </div>
   );
 } 

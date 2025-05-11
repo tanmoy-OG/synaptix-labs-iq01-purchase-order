@@ -7,5 +7,7 @@ export const API_ENDPOINTS = {
   
   // PDF upload and processing endpoints
   UPLOAD_PDF: `${API_BASE_URL}/upload`,
-  SAVE: `${API_BASE_URL}/save`,
+  SAVE_CONFIG: `${API_BASE_URL}/save`,
+  GET_CONFIG: `${API_BASE_URL}/configurations`,
+  EXTRACT_PDF: `${API_BASE_URL}/extract`,
 }; 

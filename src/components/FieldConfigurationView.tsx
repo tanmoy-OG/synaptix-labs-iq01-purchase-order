@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ConfigurePdfResponse, FieldConfig } from "@/types/api";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -79,17 +80,27 @@ export function FieldConfigurationView({ fieldConfig, onSave, onCancel }: FieldC
     setShowSaveDialog(true);
   };
 
-  const handleSaveConfirm = () => {
+  const handleSaveConfirm = async () => {
     if (!name.trim()) {
       toast.error("Please enter a configuration name");
       return;
     }
     
-    onSave({
-      ...config,
-      name: name.trim()
-    });
-    setShowSaveDialog(false);
+    try {
+      await onSave({
+        ...config,
+        name: name.trim()
+      });
+      setShowSaveDialog(false);
+    } catch (error) {
+      // If it's a 409 error, keep the dialog open so user can change the name
+      if (axios.isAxiosError(error) && error.response?.status === 409) {
+        // Dialog will stay open, allowing user to modify the name
+        return;
+      }
+      // For other errors, close the dialog
+      setShowSaveDialog(false);
+    }
   };
 
   const renderFieldConfig = (section: "header" | "item", fieldId: string, field: FieldConfig) => {

@@ -15,17 +15,18 @@ export function DataConfigurationPage() {
   const { extractPdf } = usePdfUpload();
   const [showFieldConfig, setShowFieldConfig] = useState(false);
   
-  // Get initial configuration from location state
+  // Get initial configuration and file from location state
   const initialConfig = location.state?.data as ConfigurePdfResponse;
+  const pdfFile = location.state?.file as File;
 
   useEffect(() => {
-    if (!initialConfig) {
-      toast.error("No configuration data available");
+    if (!initialConfig || !pdfFile) {
+      toast.error("No configuration data or file available");
       navigate('/');
       return;
     }
     updateConfiguration(initialConfig);
-  }, [initialConfig, navigate, updateConfiguration]);
+  }, [initialConfig, pdfFile, navigate, updateConfiguration]);
 
   const handleFieldSelect = (section: "header" | "item", fieldId: string, selected: boolean) => {
     if (!configuration) return;
@@ -64,7 +65,7 @@ export function DataConfigurationPage() {
       await saveConfiguration(newConfig);
       
       // Then extract the PDF with the saved configuration
-      const extractionResult = await extractPdf(newConfig);
+      const extractionResult = await extractPdf(pdfFile, newConfig.name);
       
       // Navigate to results page with the extraction data
       navigate('/extract-results', { 

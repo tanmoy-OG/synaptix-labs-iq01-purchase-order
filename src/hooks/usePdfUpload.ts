@@ -8,11 +8,9 @@ export type UploadResult = ConfigurePdfResponse;
 
 export function usePdfUpload() {
   const [isLoading, setIsLoading] = useState(false);
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
 
   const configurePdf = async (file: File): Promise<ConfigurePdfResponse> => {
     setIsLoading(true);
-    setPdfFile(file); // Store the file for later use
 
     try {
       // Use our API client to upload the file
@@ -42,25 +40,25 @@ export function usePdfUpload() {
     }
   };
 
-  const extractPdf = async (config: ConfigurePdfResponse): Promise<UploadResult> => {
-    if (!pdfFile) {
-      throw new Error('No PDF file available for extraction');
-    }
-
+  const extractPdf = async (file: File, configName: string): Promise<UploadResult> => {
     setIsLoading(true);
 
     try {
       // Use our API client to upload the file for extraction
       const formData = new FormData();
-      formData.append('pdf_file', pdfFile);
+      formData.append('pdf_file', file);
       formData.append('mode', 'extract');
-      formData.append('config', JSON.stringify(config));
+      formData.append('config_name', configName);
       
-      console.log("Extracting PDF with config:", config);
-      console.log("PDF File:", pdfFile);
+      // Log extraction details for debugging
+      console.warn('Extracting PDF:', {
+        configName,
+        fileName: file.name,
+        fileSize: file.size
+      });
       
       const response = await api.post<UploadResult>(
-        API_ENDPOINTS.UPLOAD_PDF,
+        API_ENDPOINTS.EXTRACT_PDF,
         formData,
         {
           headers: {
@@ -81,14 +79,9 @@ export function usePdfUpload() {
     }
   };
 
-  const clearPdfFile = () => {
-    setPdfFile(null);
-  };
-
   return {
     configurePdf,
     extractPdf,
-    isLoading,
-    clearPdfFile
+    isLoading
   };
 }
