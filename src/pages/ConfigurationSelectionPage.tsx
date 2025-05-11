@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useConfiguration } from "@/hooks/useConfiguration";
 import { usePdfUpload } from "@/hooks/usePdfUpload";
+import { cn } from "@/lib/utils";
+import { CheckCircle2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -114,17 +116,26 @@ export function ConfigurationSelectionPage() {
             ) : (
               <div className="space-y-2">
                 {configurations.map((config) => (
-                  <div
+                  <Card
                     key={config.id}
-                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                      selectedConfig === config.name
-                        ? "border-primary bg-primary/5"
-                        : "hover:border-primary/50"
-                    }`}
+                    className={cn(
+                      "cursor-pointer transition-all hover:border-primary",
+                      selectedConfig === config.name ? "border-2 border-primary bg-primary/5 shadow-md" : ""
+                    )}
                     onClick={() => handleConfigSelect(config.name)}
                   >
-                    <div className="font-medium">{config.name}</div>
-                  </div>
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="font-medium text-sm text-gray-500">Configuration</div>
+                          <div className="text-lg font-semibold mt-1">{config.name}</div>
+                        </div>
+                        {selectedConfig === config.name && (
+                          <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             )}
