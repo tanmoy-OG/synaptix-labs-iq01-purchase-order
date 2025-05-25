@@ -11,8 +11,8 @@ import { toast } from "sonner";
 export function DataConfigurationPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { configuration, updateConfiguration, saveConfiguration } = useConfiguration();
-  const { extractPdf } = usePdfUpload();
+  const { configuration, updateConfiguration, saveConfiguration, isLoading: isSaving } = useConfiguration();
+  const { extractPdf, isLoading: isExtracting } = usePdfUpload();
   const [showFieldConfig, setShowFieldConfig] = useState(false);
   
   // Get initial configuration and file from location state
@@ -38,7 +38,7 @@ export function DataConfigurationPage() {
       updatedConfig[section][fieldId] = {
         ...field,
         selected,
-        logic: selected ? "1" : "0"
+        logic: selected ? 1 : 0
       };
     }
     
@@ -103,6 +103,8 @@ export function DataConfigurationPage() {
               fieldConfig={configuration}
               onSave={handleSave}
               onCancel={() => setShowFieldConfig(false)}
+              isSaving={isSaving}
+              isExtracting={isExtracting}
             />
           ) : (
             <FieldsSelectionView

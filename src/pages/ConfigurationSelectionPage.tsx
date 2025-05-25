@@ -11,8 +11,8 @@ import { toast } from "sonner";
 export function ConfigurationSelectionPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { configurations, fetchConfigurations, isLoading } = useConfiguration();
-  const { extractPdf } = usePdfUpload();
+  const { configurations, fetchConfigurations, isLoading: isFetching } = useConfiguration();
+  const { extractPdf, isLoading: isExtracting } = usePdfUpload();
   const [selectedConfig, setSelectedConfig] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const hasLoaded = useRef(false);
@@ -58,10 +58,10 @@ export function ConfigurationSelectionPage() {
     }
 
     try {
-      const result = await extractPdf(pdfFile, selectedConfig);
+      const csvBlob = await extractPdf(pdfFile, selectedConfig);
       navigate('/extract-results', { 
         state: { 
-          data: result,
+          data: csvBlob,
           name: selectedConfig 
         } 
       });
@@ -99,7 +99,7 @@ export function ConfigurationSelectionPage() {
                   </Button>
                 </div>
               </div>
-            ) : isLoading && !hasLoaded.current ? (
+            ) : isFetching && !hasLoaded.current ? (
               <div className="text-center py-4">Loading configurations...</div>
             ) : configurations.length === 0 ? (
               <div className="text-center py-4 text-gray-500">
@@ -150,9 +150,9 @@ export function ConfigurationSelectionPage() {
                 </Button>
                 <Button
                   onClick={handleExtract}
-                  disabled={!selectedConfig || isLoading}
+                  disabled={!selectedConfig || isFetching || isExtracting}
                 >
-                  Extract PDF
+                  {isExtracting ? "Extracting..." : "Extract PDF"}
                 </Button>
               </div>
             )}

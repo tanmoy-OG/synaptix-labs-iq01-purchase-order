@@ -6,8 +6,7 @@ import { toast } from "sonner";
 
 export function FileUpload() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const { configurePdf } = usePdfUpload();
+  const { configurePdf, isLoading: isUploading } = usePdfUpload();
   const navigate = useNavigate();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,15 +22,12 @@ export function FileUpload() {
       return;
     }
 
-    setIsUploading(true);
     try {
       const config = await configurePdf(selectedFile);
       navigate('/data-configuration', { state: { data: config, file: selectedFile } });
     } catch (error) {
       console.error('Failed to configure PDF:', error);
       toast.error('Failed to process file. Please try again.');
-    } finally {
-      setIsUploading(false);
     }
   };
 

@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { ConfigurePdfResponse, FieldConfig } from "@/types/api";
 import axios from "axios";
+import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -45,12 +46,26 @@ interface FieldConfigurationViewProps {
   fieldConfig: ConfigurePdfResponse;
   onSave: (config: ConfigurePdfResponse) => void;
   onCancel: () => void;
+  isSaving: boolean;
+  isExtracting: boolean;
 }
 
-export function FieldConfigurationView({ fieldConfig, onSave, onCancel }: FieldConfigurationViewProps) {
+export function FieldConfigurationView({ fieldConfig, onSave, onCancel, isSaving, isExtracting }: FieldConfigurationViewProps) {
   const [config, setConfig] = useState<ConfigurePdfResponse>(fieldConfig);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showAddDialog, setShowAddDialog] = useState(false);
   const [name, setConfigName] = useState(fieldConfig.name);
+  const [newField, setNewField] = useState<{
+    fieldname: string;
+    type: "header" | "item";
+    label: string;
+    prompt: string;
+  }>({
+    fieldname: "",
+    type: "header",
+    label: "",
+    prompt: ""
+  });
 
   // Update local state when prop changes
   useEffect(() => {
@@ -62,7 +77,7 @@ export function FieldConfigurationView({ fieldConfig, onSave, onCancel }: FieldC
     section: "header" | "item",
     fieldId: string,
     key: keyof FieldConfig,
-    value: string | boolean
+    value: string | number | boolean 
   ) => {
     setConfig((prev) => ({
       ...prev,
@@ -103,6 +118,51 @@ export function FieldConfigurationView({ fieldConfig, onSave, onCancel }: FieldC
     }
   };
 
+  const handleAddField = () => {
+    // if (!newField.fieldname.trim()) {
+    //   toast.error("Please enter a field name");
+    //   return;
+    // }
+
+    if (!newField.label.trim()) {
+      toast.error("Please enter a field label");
+      return;
+    }
+
+    if (!newField.prompt.trim()) {
+      toast.error("Please enter a field label");
+      return;
+    }
+
+    const fieldId = Object.keys(config[newField.type]).length + 1;
+    const newFieldConfig: FieldConfig = {
+      fieldname: newField.fieldname,
+      label: newField.label,
+      logic: 2, // Default to AI Prompt
+      prompt: newField.prompt,
+      selected: true,
+      first: newField.fieldname // Using fieldname as first value
+    };
+
+    setConfig(prev => ({
+      ...prev,
+      [newField.type]: {
+        ...prev[newField.type],
+        [fieldId]: newFieldConfig
+      }
+    }));
+
+    // Reset form and close dialog
+    setNewField({
+      fieldname: "",
+      type: "header",
+      label: "",
+      prompt: ""
+    });
+    setShowAddDialog(false);
+    toast.success("Field added successfully");
+  };
+
   const renderFieldConfig = (section: "header" | "item", fieldId: string, field: FieldConfig) => {
     if (!field.selected) return null;
 
@@ -137,8 +197,8 @@ export function FieldConfigurationView({ fieldConfig, onSave, onCancel }: FieldC
             <div className="space-y-2">
               <Label>Logic</Label>
               <Select
-                value={field.logic}
-                onValueChange={(value) => handleFieldChange(section, fieldId, "logic", value)}
+                value={field.logic.toString()}
+                onValueChange={(value) => handleFieldChange(section, fieldId, "logic", parseInt(value))}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -149,7 +209,7 @@ export function FieldConfigurationView({ fieldConfig, onSave, onCancel }: FieldC
                 </SelectContent>
               </Select>
             </div>
-            {field.logic === "2" && (
+            {field.logic == 2 && (
               <div className="space-y-2 md:col-span-2">
                 <Label>Prompt</Label>
                 <Textarea
@@ -170,7 +230,17 @@ export function FieldConfigurationView({ fieldConfig, onSave, onCancel }: FieldC
   const selectedItemFields = Object.entries(config.item).filter(([, field]) => field.selected);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Floating Add Button */}
+      <Button
+        onClick={() => setShowAddDialog(true)}
+        className="fixed bottom-8 right-8 rounded-full w-14 h-14 shadow-lg"
+        size="icon"
+      >
+        <Plus className="h-6 w-6" />
+      </Button>
+
+      {/* Existing content */}
       {selectedHeaderFields.length > 0 && (
         <div className="space-y-4">
           <CardHeader>
@@ -202,6 +272,7 @@ export function FieldConfigurationView({ fieldConfig, onSave, onCancel }: FieldC
         </Button>
       </div>
 
+      {/* Save Configuration Dialog */}
       <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
         <DialogContent>
           <DialogHeader>
@@ -225,8 +296,62 @@ export function FieldConfigurationView({ fieldConfig, onSave, onCancel }: FieldC
             <Button variant="outline" onClick={() => setShowSaveDialog(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSaveConfirm}>
-              Save
+            <Button onClick={handleSaveConfirm} disabled={isSaving || isExtracting || !name.trim()}>
+              {isSaving ? "Saving..." : isExtracting ? "Extracting..." : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Field Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Field</DialogTitle>
+            <DialogDescription>
+              Configure a new field to be extracted from the document.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Type</Label>
+              <Select
+                value={newField.type}
+                onValueChange={(value: "header" | "item") => setNewField(prev => ({ ...prev, type: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="header">Header Data</SelectItem>
+                  <SelectItem value="item">Item Data</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Label</Label>
+              <Input
+                value={newField.label}
+                onChange={(e) => setNewField(prev => ({ ...prev, label: e.target.value }))}
+                placeholder="Enter field label"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Prompt</Label>
+              <Textarea
+                value={newField.prompt}
+                onChange={(e) => setNewField(prev => ({ ...prev, prompt: e.target.value }))}
+                placeholder="Enter transformation prompt"
+                className="h-20"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddField}>
+              Add Field
             </Button>
           </DialogFooter>
         </DialogContent>

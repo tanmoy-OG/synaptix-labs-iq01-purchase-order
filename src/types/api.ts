@@ -48,7 +48,7 @@ export interface SelectedData {
 export interface FieldConfig {
   fieldname: string;
   label: string;
-  logic: "0" | "1" | "2";
+  logic: 0 | 1 | 2;
   prompt: string;
   selected: boolean;
   first: string;

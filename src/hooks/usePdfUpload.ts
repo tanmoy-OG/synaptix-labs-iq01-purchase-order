@@ -40,7 +40,7 @@ export function usePdfUpload() {
     }
   };
 
-  const extractPdf = async (file: File, configName: string): Promise<UploadResult> => {
+  const extractPdf = async (file: File, configName: string): Promise<Blob> => {
     setIsLoading(true);
 
     try {
@@ -54,16 +54,19 @@ export function usePdfUpload() {
       console.warn('Extracting PDF:', {
         configName,
         fileName: file.name,
-        fileSize: file.size
+        fileSize: file.size,
+        formData: formData
       });
       
-      const response = await api.post<UploadResult>(
+      const response = await api.post<Blob>(
         API_ENDPOINTS.EXTRACT_PDF,
         formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
+          responseType: 'blob',
+          timeout: 60000 // 1 minute timeout
         }
       );
 
