@@ -92,6 +92,13 @@ export function FileUpload() {
             >
               Extract PDF
             </Button>
+            <Button
+              className="flex-1"
+              variant="outline"
+              onClick={() => navigate('/configurations')}
+            >
+              Configurations
+            </Button>
           </div>
         </div>
       </div>

@@ -8,7 +8,7 @@ const apiClient: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30 seconds
+  timeout: 300000, // 5 minutes
 });
 
 // Request interceptor for API calls
@@ -52,6 +52,18 @@ export const api = {
   post: async <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> => {
     try {
       const response: AxiosResponse<T> = await apiClient.post(url, data, config);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  /**
+   * Make a DELETE request
+   */
+  delete: async <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
+    try {
+      const response: AxiosResponse<T> = await apiClient.delete(url, config);
       return response.data;
     } catch (error) {
       throw handleApiError(error);

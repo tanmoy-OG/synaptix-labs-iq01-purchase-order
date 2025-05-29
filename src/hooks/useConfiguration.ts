@@ -80,6 +80,47 @@ export function useConfiguration() {
     }
   }, []);
 
+  const editConfiguration = useCallback(async (name: string): Promise<ConfigurePdfResponse> => {
+    setIsLoading(true);
+    try {
+      const response = await api.get<ConfigurePdfResponse>(`${API_ENDPOINTS.GET_CONFIG_BY_NAME}?name=${encodeURIComponent(name)}`);
+      setConfiguration(response);
+      return response;
+    } catch (error) {
+      console.error('Failed to fetch configuration:', error);
+      if (axios.isAxiosError(error) && error.response?.status === 400) {
+        toast.error('Configuration does not exist');
+      } else {
+        toast.error('Failed to fetch configuration details. Please try again.');
+      }
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const deleteConfiguration = useCallback(async (name: string): Promise<void> => {
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('config_name', name);
+      
+      await api.post(API_ENDPOINTS.DELETE_CONFIG, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setConfigurations(prev => prev.filter(config => config.name !== name));
+      toast.success(`Configuration "${name}" deleted successfully`);
+    } catch (error) {
+      console.error('Failed to delete configuration:', error);
+      toast.error('Failed to delete configuration. Please try again.');
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const updateConfiguration = useCallback((config: ConfigurePdfResponse) => {
     setConfiguration(config);
   }, []);
@@ -95,6 +136,8 @@ export function useConfiguration() {
     saveConfiguration,
     updateConfiguration,
     resetConfiguration,
-    fetchConfigurations
+    fetchConfigurations,
+    editConfiguration,
+    deleteConfiguration
   };
 } 

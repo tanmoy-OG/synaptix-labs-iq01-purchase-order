@@ -119,11 +119,6 @@ export function FieldConfigurationView({ fieldConfig, onSave, onCancel, isSaving
   };
 
   const handleAddField = () => {
-    // if (!newField.fieldname.trim()) {
-    //   toast.error("Please enter a field name");
-    //   return;
-    // }
-
     if (!newField.label.trim()) {
       toast.error("Please enter a field label");
       return;
@@ -332,7 +327,7 @@ export function FieldConfigurationView({ fieldConfig, onSave, onCancel, isSaving
               <Label>Label</Label>
               <Input
                 value={newField.label}
-                onChange={(e) => setNewField(prev => ({ ...prev, label: e.target.value }))}
+                onChange={(e) => setNewField(prev => ({ ...prev, label: e.target.value, fieldname: e.target.value }))}
                 placeholder="Enter field label"
               />
             </div>

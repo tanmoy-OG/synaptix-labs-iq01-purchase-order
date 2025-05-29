@@ -9,5 +9,7 @@ export const API_ENDPOINTS = {
   UPLOAD_PDF: `${API_BASE_URL}/upload`,
   SAVE_CONFIG: `${API_BASE_URL}/save`,
   GET_CONFIG: `${API_BASE_URL}/configurations`,
+  GET_CONFIG_BY_NAME: `${API_BASE_URL}/edit`,
+  DELETE_CONFIG: `${API_BASE_URL}/delete`,
   EXTRACT_PDF: `${API_BASE_URL}/extract`,
 }; 
