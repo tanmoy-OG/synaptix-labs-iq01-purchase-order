@@ -7,6 +7,7 @@ import { DataConfigurationPage } from './pages/DataConfigurationPage';
 import { DevTestPage } from './pages/DevTestPage';
 import { EditConfigurationPage } from './pages/EditConfigurationPage';
 import { ExtractResultsPage } from './pages/ExtractResultsPage';
+import { LoginPage } from './pages/LoginPage';
 import { UploadPage } from './pages/UploadPage';
 
 // Create a client
@@ -23,7 +24,8 @@ function App() {
           <DevTestPage />
         ) : (
           <Routes>
-            <Route path="/" element={<UploadPage />} />
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/upload" element={<UploadPage />} />
             <Route path="/data-configuration" element={<DataConfigurationPage />} />
             <Route path="/select-configuration" element={<ConfigurationSelectionPage />} />
             <Route path="/extract-results" element={<ExtractResultsPage />} />
