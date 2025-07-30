@@ -1,8 +1,8 @@
-# Inforium
+# Synaptix-Labs
 
-Inforium is a platform that takes purchase order PDFs and extracts the header and item data using AI in the backend, outputting the data in tabular format as an XLS file.
+Synaptix-Labs is a platform that takes purchase order PDFs and extracts the header and item data using AI in the backend, outputting the data in tabular format as an XLS file.
 
-This repository contains the front-end of the Inforium platform, built with React and ShadCN UI components.
+This repository contains the front-end of the Synaptix-Labs platform, built with React and ShadCN UI components.
 
 ## Features
 

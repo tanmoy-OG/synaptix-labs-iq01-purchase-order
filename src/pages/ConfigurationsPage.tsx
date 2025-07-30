@@ -164,6 +164,7 @@ export function ConfigurationsPage() {
               variant="destructive"
               onClick={handleDelete}
               disabled={isLoading}
+              className="text-white"
             >
               {isLoading ? "Deleting..." : "Delete"}
             </Button>

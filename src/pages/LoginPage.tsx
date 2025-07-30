@@ -43,7 +43,7 @@ const provider = new GoogleAuthProvider();
 
 export function LoginPage() {
   useEffect(() => {
-    document.title = 'Login | Inforium';
+    document.title = 'Login | Synaptix-Labs';
   }, []);
 
   const handleGoogleSignIn = async () => {
@@ -52,7 +52,7 @@ export function LoginPage() {
       const result = await signInWithPopup(auth, provider);
       // const credential = GoogleAuthProvider.credentialFromResult(result);
       // const token = credential?.accessToken;
-      // const user = result.user;
+      const user = result.user;
       toast.success('Login successful! Redirecting...');
       setTimeout(() => {
         window.location.href = '/data-configuration';
@@ -69,7 +69,7 @@ export function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md p-8 rounded-2xl shadow-xl border bg-card">
-        <h1 className="text-3xl font-bold text-primary">Welcome to Inforium</h1>
+        <h1 className="text-3xl font-bold text-primary">Welcome to Synaptix-Labs</h1>
         <p className="mb-8 text-muted-foreground">Sign in to continue to your account</p>
         <Button
           variant="outline"

@@ -96,7 +96,7 @@ export function DevTestPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 md:p-8">
       <header className="w-full max-w-4xl mb-8 text-center flex flex-col items-center">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Inforium Test Page</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Synaptix-Labs Test Page</h1>
         <p className="mt-2 text-lg text-gray-600 mb-4">
           Development testing page for components
         </p>
@@ -142,7 +142,7 @@ export function DevTestPage() {
       </main>
       
       <footer className="mt-12 text-center text-sm text-gray-500">
-        <p>© {new Date().getFullYear()} Inforium - Development Mode</p>
+        <p>© {new Date().getFullYear()} Synaptix-Labs - Development Mode</p>
       </footer>
     </div>
   );

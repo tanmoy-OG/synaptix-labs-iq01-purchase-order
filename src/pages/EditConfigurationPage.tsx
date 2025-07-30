@@ -1,16 +1,8 @@
+import { FieldConfigurationView } from "@/components/FieldConfigurationView";
 import { FieldsSelectionView } from "@/components/FieldsSelectionView";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { useConfiguration } from "@/hooks/useConfiguration";
+import { usePdfUpload } from "@/hooks/usePdfUpload";
 import { ConfigurePdfResponse } from "@/types/api";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -19,10 +11,10 @@ import { toast } from "sonner";
 export function EditConfigurationPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { editConfiguration, saveConfiguration, isLoading } = useConfiguration();
+  const { editConfiguration, saveConfiguration, isLoading: isSaving } = useConfiguration();
+  const { isLoading: isExtracting } = usePdfUpload();
   const [config, setConfig] = useState<ConfigurePdfResponse | null>(null);
-  const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
-  const [newName, setNewName] = useState("");
+  const [showFieldConfig, setShowFieldConfig] = useState(false);
 
   const configName = location.state?.name as string;
 
@@ -37,7 +29,6 @@ export function EditConfigurationPage() {
       try {
         const data = await editConfiguration(configName);
         setConfig(data);
-        setNewName(data.name);
       } catch (error) {
         console.error('Error loading configuration:', error);
         navigate('/configurations');
@@ -65,19 +56,32 @@ export function EditConfigurationPage() {
     });
   }, [config]);
 
-  const handleSave = useCallback(async () => {
+  const handleSubmit = () => {
     if (!config) return;
 
+    const hasSelectedFields = Object.values(config.header).some(field => field.selected) ||
+                            Object.values(config.item).some(field => field.selected);
+
+    if (!hasSelectedFields) {
+      toast.error("Please select at least one field");
+      return;
+    }
+
+    setShowFieldConfig(true);
+  };
+
+  const handleSave = async (newConfig: ConfigurePdfResponse) => {
     try {
-      await saveConfiguration({
-        ...config,
-        name: newName
-      });
+      // First save the configuration
+      await saveConfiguration(newConfig);
+      
+      // Navigate back to the edit configuration page
       navigate('/configurations');
     } catch (error) {
       console.error('Error saving configuration:', error);
+      toast.error('Failed to save configuration. Please try again.');
     }
-  }, [config, newName, saveConfiguration, navigate]);
+  };
 
   const handleCancel = useCallback(() => {
     navigate('/configurations');
@@ -98,46 +102,24 @@ export function EditConfigurationPage() {
           <CardTitle>Edit Configuration: {config.name}</CardTitle>
         </CardHeader>
         <CardContent>
-          <FieldsSelectionView
-            config={config}
-            onFieldSelect={handleFieldSelect}
-            onSubmit={() => setIsRenameDialogOpen(true)}
-            onCancel={handleCancel}
-          />
+        {showFieldConfig ? (
+            <FieldConfigurationView
+              fieldConfig={config}
+              onSave={handleSave}
+              onCancel={() => setShowFieldConfig(false)}
+              isSaving={isSaving}
+              isExtracting={isExtracting}
+            />
+          ) : (
+            <FieldsSelectionView
+              config={config}
+              onFieldSelect={handleFieldSelect}
+              onSubmit={handleSubmit}
+              onCancel={handleCancel}
+            />
+          )}
         </CardContent>
       </Card>
-
-      <Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Save Configuration</DialogTitle>
-            <DialogDescription>
-              You can update the configuration name if needed.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <Input
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              placeholder="Configuration name"
-            />
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsRenameDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={!newName.trim() || isLoading}
-            >
-              {isLoading ? "Saving..." : "Save"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 } 
