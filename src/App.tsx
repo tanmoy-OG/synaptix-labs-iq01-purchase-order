@@ -1,6 +1,7 @@
 import { Toaster } from '@/components/ui/sonner';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { ConfigurationSelectionPage } from './pages/ConfigurationSelectionPage';
 import { ConfigurationsPage } from './pages/ConfigurationsPage';
 import { DataConfigurationPage } from './pages/DataConfigurationPage';
@@ -24,13 +25,62 @@ function App() {
           <DevTestPage />
         ) : (
           <Routes>
-            <Route path="/" element={<LoginPage />} />
-            <Route path="/upload" element={<UploadPage />} />
-            <Route path="/data-configuration" element={<DataConfigurationPage />} />
-            <Route path="/select-configuration" element={<ConfigurationSelectionPage />} />
-            <Route path="/extract-results" element={<ExtractResultsPage />} />
-            <Route path="/configurations" element={<ConfigurationsPage />} />
-            <Route path="/edit-configuration" element={<EditConfigurationPage />} />
+            <Route 
+              path="/" 
+              element={
+                <ProtectedRoute requireAuth={false}>
+                  <LoginPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/upload" 
+              element={
+                <ProtectedRoute>
+                  <UploadPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/data-configuration" 
+              element={
+                <ProtectedRoute>
+                  <DataConfigurationPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/select-configuration" 
+              element={
+                <ProtectedRoute>
+                  <ConfigurationSelectionPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/extract-results" 
+              element={
+                <ProtectedRoute>
+                  <ExtractResultsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/configurations" 
+              element={
+                <ProtectedRoute>
+                  <ConfigurationsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/edit-configuration" 
+              element={
+                <ProtectedRoute>
+                  <EditConfigurationPage />
+                </ProtectedRoute>
+              } 
+            />
           </Routes>
         )}
         <Toaster position="top-right" />

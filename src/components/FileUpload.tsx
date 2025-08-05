@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { usePdfUpload } from "@/hooks/usePdfUpload";
+import { auth } from "@/lib/firebase";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -8,6 +9,8 @@ export function FileUpload() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { configurePdf, isLoading: isUploading } = usePdfUpload();
   const navigate = useNavigate();
+  console.log('FileUpload');
+  console.log(auth.currentUser);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

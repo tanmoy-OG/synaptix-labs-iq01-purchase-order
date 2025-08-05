@@ -1,61 +1,32 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Toaster } from '@/components/ui/sonner';
+import { auth, provider } from '@/lib/firebase';
 import { useEffect } from 'react';
 import { FcGoogle } from 'react-icons/fc';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-
-// Firebase imports (using CDN for browser, but here we use npm package)
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
-import { initializeApp } from 'firebase/app';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-
-const firebaseConfig = {
-  apiKey: 'AIzaSyBSB1d41zwViYbT40DEWmdn88OlcosLWHs',
-  authDomain: 'synaptix-user-data.firebaseapp.com',
-  databaseURL: 'https://synaptix-user-data-default-rtdb.firebaseio.com',
-  projectId: 'synaptix-user-data',
-  storageBucket: 'synaptix-user-data.appspot.com',
-  messagingSenderId: '1063709047082',
-  appId: '1:1063709047082:web:c3604b9d472df339c50653',
-};
-
-// Initialize Firebase only once
-let app: ReturnType<typeof initializeApp> | undefined;
-
-declare global {
-  interface Window {
-    _firebaseApp?: ReturnType<typeof initializeApp>;
-  }
-}
-
-if (!window._firebaseApp) {
-  app = initializeApp(firebaseConfig);
-  window._firebaseApp = app;
-} else {
-  app = window._firebaseApp;
-}
-
-const provider = new GoogleAuthProvider();
+import { signInWithPopup } from 'firebase/auth';
 
 export function LoginPage() {
+  const navigate = useNavigate();
   useEffect(() => {
     document.title = 'Login | Synaptix-Labs';
   }, []);
 
   const handleGoogleSignIn = async () => {
-    const auth = getAuth();
     try {
       const result = await signInWithPopup(auth, provider);
       // const credential = GoogleAuthProvider.credentialFromResult(result);
       // const token = credential?.accessToken;
       const user = result.user;
+      console.log('Inside Login');
+      console.log(user);
       toast.success('Login successful! Redirecting...');
       setTimeout(() => {
-        window.location.href = '/data-configuration';
+        navigate('/upload');
       }, 1000);
     } catch (error: unknown) {
       if (error instanceof Error) {
