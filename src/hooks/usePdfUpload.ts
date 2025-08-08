@@ -9,7 +9,7 @@ export type UploadResult = ConfigurePdfResponse;
 export function usePdfUpload() {
   const [isLoading, setIsLoading] = useState(false);
 
-  const configurePdf = async (file: File): Promise<ConfigurePdfResponse> => {
+  const configurePdf = async (file: File, uid: string): Promise<ConfigurePdfResponse> => {
     setIsLoading(true);
 
     try {
@@ -17,6 +17,7 @@ export function usePdfUpload() {
       const formData = new FormData();
       formData.append('pdf_file', file);
       formData.append('mode', 'configure');
+      formData.append('uid', uid);
       
       const response = await api.post<ConfigurePdfResponse>(
         API_ENDPOINTS.UPLOAD_PDF,
@@ -40,7 +41,7 @@ export function usePdfUpload() {
     }
   };
 
-  const extractPdf = async (file: File, configName: string): Promise<Blob> => {
+  const extractPdf = async (file: File, configName: string, uid: string): Promise<Blob> => {
     setIsLoading(true);
 
     try {
@@ -49,12 +50,14 @@ export function usePdfUpload() {
       formData.append('pdf_file', file);
       formData.append('mode', 'extract');
       formData.append('config_name', configName);
+      formData.append('uid', uid);
       
       // Log extraction details for debugging
       console.warn('Extracting PDF:', {
         configName,
         fileName: file.name,
         fileSize: file.size,
+        uid,
         formData: formData
       });
       

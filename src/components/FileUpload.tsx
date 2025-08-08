@@ -25,8 +25,13 @@ export function FileUpload() {
       return;
     }
 
+    if (!auth.currentUser?.uid) {
+      toast.error("User not authenticated");
+      return;
+    }
+
     try {
-      const config = await configurePdf(selectedFile);
+      const config = await configurePdf(selectedFile, auth.currentUser.uid);
       navigate('/data-configuration', { state: { data: config, file: selectedFile } });
     } catch (error) {
       console.error('Failed to configure PDF:', error);

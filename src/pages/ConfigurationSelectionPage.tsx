@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useConfiguration } from "@/hooks/useConfiguration";
 import { usePdfUpload } from "@/hooks/usePdfUpload";
+import { auth } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
 import { CheckCircle2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -31,9 +32,14 @@ export function ConfigurationSelectionPage() {
   const loadConfigurations = useCallback(async () => {
     if (hasLoaded.current) return;
     
+    if (!auth.currentUser?.uid) {
+      setError('User not authenticated');
+      return;
+    }
+    
     try {
       setError(null);
-      await fetchConfigurations();
+      await fetchConfigurations(auth.currentUser.uid);
       hasLoaded.current = true;
     } catch (err) {
       setError('Failed to load configurations. Please try again.');
@@ -57,8 +63,13 @@ export function ConfigurationSelectionPage() {
       return;
     }
 
+    if (!auth.currentUser?.uid) {
+      toast.error("User not authenticated");
+      return;
+    }
+
     try {
-      const csvBlob = await extractPdf(pdfFile, selectedConfig);
+      const csvBlob = await extractPdf(pdfFile, selectedConfig, auth.currentUser.uid);
       navigate('/extract-results', { 
         state: { 
           data: csvBlob,

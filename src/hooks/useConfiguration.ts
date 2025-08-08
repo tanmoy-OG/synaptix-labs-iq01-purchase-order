@@ -16,7 +16,7 @@ export function useConfiguration() {
   const [configurations, setConfigurations] = useState<Configuration[]>([]);
   const isFetching = useRef(false);
 
-  const fetchConfigurations = useCallback(async (): Promise<Configuration[]> => {
+  const fetchConfigurations = useCallback(async (uid: string): Promise<Configuration[]> => {
     // Prevent multiple simultaneous fetches
     if (isFetching.current) {
       return configurations;
@@ -26,7 +26,7 @@ export function useConfiguration() {
     setIsLoading(true);
 
     try {
-      const response = await api.get<Configuration[]>(API_ENDPOINTS.GET_CONFIG);
+      const response = await api.get<Configuration[]>(`${API_ENDPOINTS.GET_CONFIG}?uid=${encodeURIComponent(uid)}`);
       
       // Ensure response is an array
       if (!Array.isArray(response)) {
@@ -52,11 +52,11 @@ export function useConfiguration() {
     }
   }, [configurations]);
 
-  const saveConfiguration = useCallback(async (config: ConfigurePdfResponse): Promise<void> => {
+  const saveConfiguration = useCallback(async (config: ConfigurePdfResponse, uid: string): Promise<void> => {
     setIsLoading(true);
     try {
       const configString = JSON.stringify(config);
-      const res = await api.post(API_ENDPOINTS.SAVE_CONFIG, configString, {
+      const res = await api.post(`${API_ENDPOINTS.SAVE_CONFIG}?uid=${encodeURIComponent(uid)}`, configString, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -80,10 +80,10 @@ export function useConfiguration() {
     }
   }, []);
 
-  const editConfiguration = useCallback(async (name: string): Promise<ConfigurePdfResponse> => {
+  const editConfiguration = useCallback(async (name: string, uid: string): Promise<ConfigurePdfResponse> => {
     setIsLoading(true);
     try {
-      const response = await api.get<ConfigurePdfResponse>(`${API_ENDPOINTS.GET_CONFIG_BY_NAME}?name=${encodeURIComponent(name)}`);
+      const response = await api.get<ConfigurePdfResponse>(`${API_ENDPOINTS.GET_CONFIG_BY_NAME}?name=${encodeURIComponent(name)}&uid=${encodeURIComponent(uid)}`);
       setConfiguration(response);
       return response;
     } catch (error) {
@@ -99,11 +99,12 @@ export function useConfiguration() {
     }
   }, []);
 
-  const deleteConfiguration = useCallback(async (name: string): Promise<void> => {
+  const deleteConfiguration = useCallback(async (name: string, uid: string): Promise<void> => {
     setIsLoading(true);
     try {
       const formData = new FormData();
       formData.append('config_name', name);
+      formData.append('uid', uid);
       
       await api.post(API_ENDPOINTS.DELETE_CONFIG, formData, {
         headers: {

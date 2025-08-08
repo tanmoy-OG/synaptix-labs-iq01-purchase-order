@@ -3,6 +3,7 @@ import { FieldsSelectionView } from "@/components/FieldsSelectionView";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useConfiguration } from "@/hooks/useConfiguration";
 import { usePdfUpload } from "@/hooks/usePdfUpload";
+import { auth } from "@/lib/firebase";
 import { ConfigurePdfResponse } from "@/types/api";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -25,9 +26,15 @@ export function EditConfigurationPage() {
       return;
     }
 
+    if (!auth.currentUser?.uid) {
+      toast.error("User not authenticated");
+      navigate('/configurations');
+      return;
+    }
+
     const loadConfiguration = async () => {
       try {
-        const data = await editConfiguration(configName);
+        const data = await editConfiguration(configName, auth.currentUser.uid);
         setConfig(data);
       } catch (error) {
         console.error('Error loading configuration:', error);
@@ -71,9 +78,14 @@ export function EditConfigurationPage() {
   };
 
   const handleSave = async (newConfig: ConfigurePdfResponse) => {
+    if (!auth.currentUser?.uid) {
+      toast.error("User not authenticated");
+      return;
+    }
+
     try {
       // First save the configuration
-      await saveConfiguration(newConfig);
+      await saveConfiguration(newConfig, auth.currentUser.uid);
       
       // Navigate back to the edit configuration page
       navigate('/configurations');

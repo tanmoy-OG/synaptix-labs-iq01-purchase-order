@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useConfiguration } from "@/hooks/useConfiguration";
+import { auth } from "@/lib/firebase";
 import { Pencil, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -32,9 +33,14 @@ export function ConfigurationsPage() {
   const loadConfigurations = useCallback(async () => {
     if (hasLoaded.current) return;
     
+    if (!auth.currentUser?.uid) {
+      setError('User not authenticated');
+      return;
+    }
+    
     try {
       setError(null);
-      await fetchConfigurations();
+      await fetchConfigurations(auth.currentUser.uid);
       hasLoaded.current = true;
     } catch (err) {
       setError('Failed to load configurations. Please try again.');
@@ -58,8 +64,13 @@ export function ConfigurationsPage() {
   const handleDelete = async () => {
     if (!configToDelete) return;
 
+    if (!auth.currentUser?.uid) {
+      setError('User not authenticated');
+      return;
+    }
+
     try {
-      await deleteConfiguration(configToDelete);
+      await deleteConfiguration(configToDelete, auth.currentUser.uid);
       // Refresh the list after deletion
       hasLoaded.current = false;
       await loadConfigurations();
