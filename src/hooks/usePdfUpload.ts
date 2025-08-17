@@ -18,16 +18,12 @@ export function usePdfUpload() {
       formData.append('pdf_file', file);
       formData.append('mode', 'configure');
       formData.append('uid', uid);
-      
-      const response = await api.post<ConfigurePdfResponse>(
-        API_ENDPOINTS.UPLOAD_PDF,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+
+      const response = await api.post<ConfigurePdfResponse>(API_ENDPOINTS.UPLOAD_PDF, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
       toast.success('Data configuration initiated successfully');
       return response;
@@ -51,27 +47,23 @@ export function usePdfUpload() {
       formData.append('mode', 'extract');
       formData.append('config_name', configName);
       formData.append('uid', uid);
-      
+
       // Log extraction details for debugging
       console.warn('Extracting PDF:', {
         configName,
         fileName: file.name,
         fileSize: file.size,
         uid,
-        formData: formData
+        formData: formData,
       });
-      
-      const response = await api.post<Blob>(
-        API_ENDPOINTS.EXTRACT_PDF,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          responseType: 'blob',
-          timeout: 300000 // 5 minutes timeout
-        }
-      );
+
+      const response = await api.post<Blob>(API_ENDPOINTS.EXTRACT_PDF, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        responseType: 'blob',
+        timeout: 300000, // 5 minutes timeout
+      });
 
       toast.success('Data extracted successfully');
       return response;
@@ -88,6 +80,6 @@ export function usePdfUpload() {
   return {
     configurePdf,
     extractPdf,
-    isLoading
+    isLoading,
   };
 }

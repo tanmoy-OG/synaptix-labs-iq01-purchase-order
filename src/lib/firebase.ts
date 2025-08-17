@@ -35,4 +35,4 @@ if (!window._firebaseApp) {
 export const auth = getAuth();
 export const provider = new GoogleAuthProvider();
 
-export default app; 
+export default app;

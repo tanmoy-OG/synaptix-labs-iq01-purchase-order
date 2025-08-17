@@ -54,4 +54,4 @@ export function LoginPage() {
       </Card>
     </div>
   );
-} 
+}

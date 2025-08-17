@@ -63,4 +63,4 @@ export interface ConfigurePdfResponse {
   name: string;
   header: Record<string, FieldConfig>;
   item: Record<string, FieldConfig>;
-} 
+}

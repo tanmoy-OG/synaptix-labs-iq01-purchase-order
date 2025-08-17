@@ -21,65 +21,65 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        {isDev && import.meta.env.VITE_ENABLE_TEST_PAGE === "true" ? (
+        {isDev && import.meta.env.VITE_ENABLE_TEST_PAGE === 'true' ? (
           <DevTestPage />
         ) : (
           <Routes>
-            <Route 
-              path="/" 
+            <Route
+              path="/"
               element={
                 <ProtectedRoute requireAuth={false}>
                   <LoginPage />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/upload" 
+            <Route
+              path="/upload"
               element={
                 <ProtectedRoute>
                   <UploadPage />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/data-configuration" 
+            <Route
+              path="/data-configuration"
               element={
                 <ProtectedRoute>
                   <DataConfigurationPage />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/select-configuration" 
+            <Route
+              path="/select-configuration"
               element={
                 <ProtectedRoute>
                   <ConfigurationSelectionPage />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/extract-results" 
+            <Route
+              path="/extract-results"
               element={
                 <ProtectedRoute>
                   <ExtractResultsPage />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/configurations" 
+            <Route
+              path="/configurations"
               element={
                 <ProtectedRoute>
                   <ConfigurationsPage />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/edit-configuration" 
+            <Route
+              path="/edit-configuration"
               element={
                 <ProtectedRoute>
                   <EditConfigurationPage />
                 </ProtectedRoute>
-              } 
+              }
             />
           </Routes>
         )}

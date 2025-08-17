@@ -1,13 +1,13 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useConfiguration } from "@/hooks/useConfiguration";
-import { usePdfUpload } from "@/hooks/usePdfUpload";
-import { auth } from "@/lib/firebase";
-import { cn } from "@/lib/utils";
-import { CheckCircle2 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useConfiguration } from '@/hooks/useConfiguration';
+import { usePdfUpload } from '@/hooks/usePdfUpload';
+import { auth } from '@/lib/firebase';
+import { cn } from '@/lib/utils';
+import { CheckCircle2 } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export function ConfigurationSelectionPage() {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ export function ConfigurationSelectionPage() {
 
   useEffect(() => {
     if (!pdfFile) {
-      toast.error("No PDF file selected");
+      toast.error('No PDF file selected');
       navigate('/');
       return;
     }
@@ -31,12 +31,12 @@ export function ConfigurationSelectionPage() {
 
   const loadConfigurations = useCallback(async () => {
     if (hasLoaded.current) return;
-    
+
     if (!auth.currentUser?.uid) {
       setError('User not authenticated');
       return;
     }
-    
+
     try {
       setError(null);
       await fetchConfigurations(auth.currentUser.uid);
@@ -53,28 +53,28 @@ export function ConfigurationSelectionPage() {
 
   const handleExtract = useCallback(async () => {
     if (!selectedConfig) {
-      toast.error("Please select a configuration");
+      toast.error('Please select a configuration');
       return;
     }
 
     if (!pdfFile) {
-      toast.error("No PDF file selected");
+      toast.error('No PDF file selected');
       navigate('/');
       return;
     }
 
     if (!auth.currentUser?.uid) {
-      toast.error("User not authenticated");
+      toast.error('User not authenticated');
       return;
     }
 
     try {
       const csvBlob = await extractPdf(pdfFile, selectedConfig, auth.currentUser.uid);
-      navigate('/extract-results', { 
-        state: { 
+      navigate('/extract-results', {
+        state: {
           data: csvBlob,
-          name: selectedConfig 
-        } 
+          name: selectedConfig,
+        },
       });
     } catch (error) {
       console.error('Failed to extract PDF:', error);
@@ -102,10 +102,7 @@ export function ConfigurationSelectionPage() {
               <div className="text-center py-4 text-red-500">
                 {error}
                 <div className="mt-4">
-                  <Button
-                    variant="outline"
-                    onClick={handleBack}
-                  >
+                  <Button variant="outline" onClick={handleBack}>
                     Return to Upload
                   </Button>
                 </div>
@@ -116,22 +113,21 @@ export function ConfigurationSelectionPage() {
               <div className="text-center py-4 text-gray-500">
                 <p>No configurations found. Please create a configuration first.</p>
                 <div className="mt-4">
-                  <Button
-                    variant="outline"
-                    onClick={handleBack}
-                  >
+                  <Button variant="outline" onClick={handleBack}>
                     Return to Upload
                   </Button>
                 </div>
               </div>
             ) : (
               <div className="space-y-2">
-                {configurations.map((config) => (
+                {configurations.map(config => (
                   <Card
                     key={config.id}
                     className={cn(
-                      "cursor-pointer transition-all hover:border-primary",
-                      selectedConfig === config.name ? "border-2 border-primary bg-primary/5 shadow-md" : ""
+                      'cursor-pointer transition-all hover:border-primary',
+                      selectedConfig === config.name
+                        ? 'border-2 border-primary bg-primary/5 shadow-md'
+                        : ''
                     )}
                     onClick={() => handleConfigSelect(config.name)}
                   >
@@ -153,17 +149,14 @@ export function ConfigurationSelectionPage() {
 
             {!error && configurations.length > 0 && (
               <div className="flex justify-end space-x-4 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={handleBack}
-                >
+                <Button variant="outline" onClick={handleBack}>
                   Back
                 </Button>
                 <Button
                   onClick={handleExtract}
                   disabled={!selectedConfig || isFetching || isExtracting}
                 >
-                  {isExtracting ? "Extracting..." : "Extract PDF"}
+                  {isExtracting ? 'Extracting...' : 'Extract PDF'}
                 </Button>
               </div>
             )}
@@ -172,4 +165,4 @@ export function ConfigurationSelectionPage() {
       </Card>
     </div>
   );
-} 
+}

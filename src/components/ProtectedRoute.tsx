@@ -26,4 +26,4 @@ export function ProtectedRoute({ children, requireAuth = true }: ProtectedRouteP
   }
 
   return <>{children}</>;
-} 
+}

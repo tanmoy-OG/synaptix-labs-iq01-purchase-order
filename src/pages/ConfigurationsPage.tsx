@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -7,7 +7,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   Table,
   TableBody,
@@ -15,16 +15,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { useConfiguration } from "@/hooks/useConfiguration";
-import { auth } from "@/lib/firebase";
-import { Pencil, Trash2 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+} from '@/components/ui/table';
+import { useConfiguration } from '@/hooks/useConfiguration';
+import { auth } from '@/lib/firebase';
+import { Pencil, Trash2 } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function ConfigurationsPage() {
   const navigate = useNavigate();
-  const { configurations, fetchConfigurations, deleteConfiguration, isLoading } = useConfiguration();
+  const { configurations, fetchConfigurations, deleteConfiguration, isLoading } =
+    useConfiguration();
   const [error, setError] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [configToDelete, setConfigToDelete] = useState<string | null>(null);
@@ -32,12 +33,12 @@ export function ConfigurationsPage() {
 
   const loadConfigurations = useCallback(async () => {
     if (hasLoaded.current) return;
-    
+
     if (!auth.currentUser?.uid) {
       setError('User not authenticated');
       return;
     }
-    
+
     try {
       setError(null);
       await fetchConfigurations(auth.currentUser.uid);
@@ -92,10 +93,7 @@ export function ConfigurationsPage() {
             <div className="text-center py-4 text-red-500">
               {error}
               <div className="mt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => navigate('/')}
-                >
+                <Button variant="outline" onClick={() => navigate('/')}>
                   Return to Upload
                 </Button>
               </div>
@@ -115,16 +113,12 @@ export function ConfigurationsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {configurations.map((config) => (
+                {configurations.map(config => (
                   <TableRow key={config.id}>
                     <TableCell className="font-medium">{config.name}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleEdit(config.name)}
-                        >
+                        <Button variant="ghost" size="icon" onClick={() => handleEdit(config.name)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
@@ -143,10 +137,7 @@ export function ConfigurationsPage() {
           )}
 
           <div className="flex justify-end mt-4">
-            <Button
-              variant="outline"
-              onClick={() => navigate('/')}
-            >
+            <Button variant="outline" onClick={() => navigate('/')}>
               Back to Upload
             </Button>
           </div>
@@ -158,7 +149,8 @@ export function ConfigurationsPage() {
           <DialogHeader>
             <DialogTitle>Delete Configuration</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete configuration "{configToDelete}"? This action cannot be undone.
+              Are you sure you want to delete configuration "{configToDelete}"? This action cannot
+              be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -177,11 +169,11 @@ export function ConfigurationsPage() {
               disabled={isLoading}
               className="text-white"
             >
-              {isLoading ? "Deleting..." : "Delete"}
+              {isLoading ? 'Deleting...' : 'Delete'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
   );
-} 
+}

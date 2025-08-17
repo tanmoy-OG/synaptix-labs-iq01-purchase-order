@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface CSVRow {
   [key: string]: string;
@@ -27,12 +27,13 @@ export function ExtractResultsPage() {
     try {
       const text = await csvBlob.text();
       const lines = text.split('\n').filter(line => line.trim());
-      
+
       if (lines.length > 0) {
         const headers = lines[0].split(',').map(header => header.trim().replace(/"/g, ''));
         setHeaders(headers);
-        
-        const data = lines.slice(1).map(line => { // Show all rows
+
+        const data = lines.slice(1).map(line => {
+          // Show all rows
           const values = line.split(',').map(value => value.trim().replace(/"/g, ''));
           const row: CSVRow = {};
           headers.forEach((header, index) => {
@@ -40,7 +41,7 @@ export function ExtractResultsPage() {
           });
           return row;
         });
-        
+
         setCsvData(data);
       }
     } catch (error) {
@@ -59,10 +60,7 @@ export function ExtractResultsPage() {
           </CardHeader>
           <CardContent>
             <p className="text-red-500">No extraction data available</p>
-            <Button 
-              onClick={() => navigate("/")}
-              className="mt-4"
-            >
+            <Button onClick={() => navigate('/')} className="mt-4">
               Return to Home
             </Button>
           </CardContent>
@@ -92,18 +90,18 @@ export function ExtractResultsPage() {
           <div className="space-y-6">
             <div className="text-center">
               <div className="p-6 bg-green-50 rounded-full inline-block">
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  className="h-20 w-20 text-green-500" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-20 w-20 text-green-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M5 13l4 4L19 7" 
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
                   />
                 </svg>
               </div>
@@ -129,7 +127,10 @@ export function ExtractResultsPage() {
                       <thead className="sticky top-0 bg-gray-50">
                         <tr>
                           {headers.map((header, index) => (
-                            <th key={index} className="border border-gray-300 px-4 py-2 text-left font-medium text-gray-700 bg-gray-50">
+                            <th
+                              key={index}
+                              className="border border-gray-300 px-4 py-2 text-left font-medium text-gray-700 bg-gray-50"
+                            >
                               {header}
                             </th>
                           ))}
@@ -139,7 +140,10 @@ export function ExtractResultsPage() {
                         {csvData.map((row, rowIndex) => (
                           <tr key={rowIndex} className="hover:bg-gray-50">
                             {headers.map((header, colIndex) => (
-                              <td key={colIndex} className="border border-gray-300 px-4 py-2 text-sm">
+                              <td
+                                key={colIndex}
+                                className="border border-gray-300 px-4 py-2 text-sm"
+                              >
                                 {row[header] || ''}
                               </td>
                             ))}
@@ -154,14 +158,14 @@ export function ExtractResultsPage() {
               </div>
 
               <div className="flex justify-center space-x-4 pt-6">
-                <Button 
+                <Button
                   onClick={handleDownload}
                   className="px-8 py-3 text-lg bg-green-600 hover:bg-green-700"
                 >
                   Download CSV
                 </Button>
-                <Button 
-                  onClick={() => navigate("/")}
+                <Button
+                  onClick={() => navigate('/')}
                   variant="outline"
                   className="px-8 py-3 text-lg"
                 >
@@ -174,4 +178,4 @@ export function ExtractResultsPage() {
       </Card>
     </div>
   );
-} 
+}

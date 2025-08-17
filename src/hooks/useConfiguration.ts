@@ -1,9 +1,9 @@
-import api from "@/lib/api/client";
-import { API_ENDPOINTS } from "@/lib/api/endpoints";
-import { ConfigurePdfResponse } from "@/types/api";
-import axios from "axios";
-import { useCallback, useRef, useState } from "react";
-import { toast } from "sonner";
+import api from '@/lib/api/client';
+import { API_ENDPOINTS } from '@/lib/api/endpoints';
+import { ConfigurePdfResponse } from '@/types/api';
+import axios from 'axios';
+import { useCallback, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 export interface Configuration {
   id: string;
@@ -16,88 +16,120 @@ export function useConfiguration() {
   const [configurations, setConfigurations] = useState<Configuration[]>([]);
   const isFetching = useRef(false);
 
-  const fetchConfigurations = useCallback(async (uid: string): Promise<Configuration[]> => {
-    // Prevent multiple simultaneous fetches
-    if (isFetching.current) {
-      return configurations;
-    }
-
-    isFetching.current = true;
-    setIsLoading(true);
-
-    try {
-      const response = await api.get<Configuration[]>(`${API_ENDPOINTS.GET_CONFIG}?uid=${encodeURIComponent(uid)}`);
-      
-      // Ensure response is an array
-      if (!Array.isArray(response)) {
-        throw new Error('Invalid response format from server');
+  const fetchConfigurations = useCallback(
+    async (uid: string): Promise<Configuration[]> => {
+      // Prevent multiple simultaneous fetches
+      if (isFetching.current) {
+        return configurations;
       }
 
-      // Validate each configuration has required fields
-      const validConfigurations = response.filter(config => 
-        config && typeof config === 'object' && 
-        'id' in config && 'name' in config
-      );
+      isFetching.current = true;
+      setIsLoading(true);
 
-      setConfigurations(validConfigurations);
-      return validConfigurations;
-    } catch (error) {
-      console.error('Failed to fetch configurations:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch configurations';
-      toast.error(errorMessage);
-      throw error;
-    } finally {
-      setIsLoading(false);
-      isFetching.current = false;
-    }
-  }, [configurations]);
+      try {
+        const formData = new FormData();
+        formData.append('uid', uid);
+        const response = await api.post<Configuration[]>(API_ENDPOINTS.GET_CONFIG, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
 
-  const saveConfiguration = useCallback(async (config: ConfigurePdfResponse, uid: string): Promise<void> => {
-    setIsLoading(true);
-    try {
-      const configString = JSON.stringify(config);
-      const res = await api.post(`${API_ENDPOINTS.SAVE_CONFIG}?uid=${encodeURIComponent(uid)}`, configString, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      setConfiguration(config);
-      console.log(res);
-      console.log(config);
-      toast.success(`Configuration "${config.name}" saved successfully`);
-    } catch (error) {
-      console.error('Failed to save configuration:', error);
-      
-      // Handle 409 Conflict error specifically
-      if (axios.isAxiosError(error) && error.response?.status === 409) {
-        toast.error(`A configuration with the name "${config.name}" already exists. Please choose a different name.`);
-      } else {
-        toast.error('Failed to save configuration. Please try again.');
+        // Ensure response is an array
+        if (!Array.isArray(response)) {
+          throw new Error('Invalid response format from server');
+        }
+
+        // Validate each configuration has required fields
+        const validConfigurations = response.filter(
+          config => config && typeof config === 'object' && 'id' in config && 'name' in config
+        );
+
+        setConfigurations(validConfigurations);
+        return validConfigurations;
+      } catch (error) {
+        console.error('Failed to fetch configurations:', error);
+        const errorMessage =
+          error instanceof Error ? error.message : 'Failed to fetch configurations';
+        toast.error(errorMessage);
+        throw error;
+      } finally {
+        setIsLoading(false);
+        isFetching.current = false;
       }
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [configurations]
+  );
 
-  const editConfiguration = useCallback(async (name: string, uid: string): Promise<ConfigurePdfResponse> => {
-    setIsLoading(true);
-    try {
-      const response = await api.get<ConfigurePdfResponse>(`${API_ENDPOINTS.GET_CONFIG_BY_NAME}?name=${encodeURIComponent(name)}&uid=${encodeURIComponent(uid)}`);
-      setConfiguration(response);
-      return response;
-    } catch (error) {
-      console.error('Failed to fetch configuration:', error);
-      if (axios.isAxiosError(error) && error.response?.status === 400) {
-        toast.error('Configuration does not exist');
-      } else {
-        toast.error('Failed to fetch configuration details. Please try again.');
+  const saveConfiguration = useCallback(
+    async (config: ConfigurePdfResponse, uid: string): Promise<void> => {
+      setIsLoading(true);
+      try {
+        const configString = JSON.stringify(config);
+        const res = await api.post(
+          `${API_ENDPOINTS.SAVE_CONFIG}?uid=${encodeURIComponent(uid)}`,
+          configString,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        setConfiguration(config);
+        console.log(res);
+        console.log(config);
+        toast.success(`Configuration "${config.name}" saved successfully`);
+      } catch (error) {
+        console.error('Failed to save configuration:', error);
+
+        // Handle 409 Conflict error specifically
+        if (axios.isAxiosError(error) && error.response?.status === 409) {
+          toast.error(
+            `A configuration with the name "${config.name}" already exists. Please choose a different name.`
+          );
+        } else {
+          toast.error('Failed to save configuration. Please try again.');
+        }
+        throw error;
+      } finally {
+        setIsLoading(false);
       }
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    []
+  );
+
+  const editConfiguration = useCallback(
+    async (name: string, uid: string): Promise<ConfigurePdfResponse> => {
+      setIsLoading(true);
+      try {
+        const formData = new FormData();
+        formData.append('config_name', name);
+        formData.append('uid', uid);
+        const response = await api.post<ConfigurePdfResponse>(
+          API_ENDPOINTS.GET_CONFIG_BY_NAME,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+        setConfiguration(response);
+        return response;
+      } catch (error) {
+        console.error('Failed to fetch configuration:', error);
+        if (axios.isAxiosError(error) && error.response?.status === 400) {
+          toast.error('Configuration does not exist');
+        } else {
+          toast.error('Failed to fetch configuration details. Please try again.');
+        }
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   const deleteConfiguration = useCallback(async (name: string, uid: string): Promise<void> => {
     setIsLoading(true);
@@ -105,7 +137,7 @@ export function useConfiguration() {
       const formData = new FormData();
       formData.append('config_name', name);
       formData.append('uid', uid);
-      
+
       await api.post(API_ENDPOINTS.DELETE_CONFIG, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -139,6 +171,6 @@ export function useConfiguration() {
     resetConfiguration,
     fetchConfigurations,
     editConfiguration,
-    deleteConfiguration
+    deleteConfiguration,
   };
-} 
+}

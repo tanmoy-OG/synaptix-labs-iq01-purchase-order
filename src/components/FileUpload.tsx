@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { usePdfUpload } from "@/hooks/usePdfUpload";
-import { auth } from "@/lib/firebase";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { Button } from '@/components/ui/button';
+import { usePdfUpload } from '@/hooks/usePdfUpload';
+import { auth } from '@/lib/firebase';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export function FileUpload() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -21,12 +21,12 @@ export function FileUpload() {
 
   const handleConfigure = async () => {
     if (!selectedFile) {
-      toast.error("Please select a file first");
+      toast.error('Please select a file first');
       return;
     }
 
     if (!auth.currentUser?.uid) {
-      toast.error("User not authenticated");
+      toast.error('User not authenticated');
       return;
     }
 
@@ -41,7 +41,7 @@ export function FileUpload() {
 
   const handleExtract = () => {
     if (!selectedFile) {
-      toast.error("Please select a file first");
+      toast.error('Please select a file first');
       return;
     }
     navigate('/select-configuration', { state: { file: selectedFile } });
@@ -61,20 +61,27 @@ export function FileUpload() {
           <div className="flex items-center justify-center w-full">
             <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <svg className="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                <svg
+                  className="w-8 h-8 mb-4 text-gray-500"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 16"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                  />
                 </svg>
                 <p className="mb-2 text-sm text-gray-500">
                   <span className="font-semibold">Click to upload</span> or drag and drop
                 </p>
                 <p className="text-xs text-gray-500">PDF files only</p>
               </div>
-              <input
-                type="file"
-                className="hidden"
-                accept=".pdf"
-                onChange={handleFileChange}
-              />
+              <input type="file" className="hidden" accept=".pdf" onChange={handleFileChange} />
             </label>
           </div>
 
@@ -90,7 +97,7 @@ export function FileUpload() {
               onClick={handleConfigure}
               disabled={!selectedFile || isUploading}
             >
-              {isUploading ? "Processing..." : "Configure"}
+              {isUploading ? 'Processing...' : 'Configure'}
             </Button>
             <Button
               className="flex-1"
@@ -112,4 +119,4 @@ export function FileUpload() {
       </div>
     </div>
   );
-} 
+}

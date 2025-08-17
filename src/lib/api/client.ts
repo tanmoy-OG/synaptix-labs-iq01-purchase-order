@@ -13,21 +13,21 @@ const apiClient: AxiosInstance = axios.create({
 
 // Request interceptor for API calls
 apiClient.interceptors.request.use(
-  (config) => {
+  config => {
     // You can add auth tokens here if needed
     return config;
   },
-  (error) => {
+  error => {
     return Promise.reject(handleApiError(error));
   }
 );
 
 // Response interceptor for API calls
 apiClient.interceptors.response.use(
-  (response) => {
+  response => {
     return response;
   },
-  (error) => {
+  error => {
     return Promise.reject(handleApiError(error));
   }
 );
@@ -77,13 +77,13 @@ export const api = {
     try {
       const formData = new FormData();
       formData.append(fieldName, file);
-      
+
       const response: AxiosResponse<T> = await apiClient.post(url, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      
+
       return response.data;
     } catch (error) {
       throw handleApiError(error);
@@ -91,4 +91,4 @@ export const api = {
   },
 };
 
-export default api; 
+export default api;
