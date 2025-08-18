@@ -65,10 +65,13 @@ export function useConfiguration() {
     async (config: ConfigurePdfResponse, uid: string): Promise<void> => {
       setIsLoading(true);
       try {
+        const formData = new FormData();
         const configString = JSON.stringify(config);
+        formData.append('config', configString)
+        formData.append('uid', uid);
         const res = await api.post(
-          `${API_ENDPOINTS.SAVE_CONFIG}?uid=${encodeURIComponent(uid)}`,
-          configString,
+          API_ENDPOINTS.SAVE_CONFIG,
+          formData,
           {
             headers: {
               'Content-Type': 'application/json',
