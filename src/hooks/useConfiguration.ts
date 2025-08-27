@@ -67,17 +67,18 @@ export function useConfiguration() {
       try {
         const formData = new FormData();
         const configString = JSON.stringify(config);
+        console.log("🚀 ~ useConfiguration ~ configString:", configString)
         formData.append('config', configString)
         formData.append('uid', uid);
+        console.log("🚀 ~ useConfiguration ~ uid:", uid)
+
         const res = await api.post(
           API_ENDPOINTS.SAVE_CONFIG,
-          formData,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+          formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
         setConfiguration(config);
         console.log(res);
         console.log(config);

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Papa from 'papaparse';
 
 interface CSVRow {
   [key: string]: string;
@@ -24,28 +25,20 @@ export function ExtractResultsPage() {
 
   const parseCSV = async () => {
     setIsLoading(true);
+
     try {
       const text = await csvBlob.text();
-      const lines = text.split('\n').filter(line => line.trim());
 
-      if (lines.length > 0) {
-        const headers = lines[0].split(',').map(header => header.trim().replace(/"/g, ''));
-        setHeaders(headers);
-
-        const data = lines.slice(1).map(line => {
-          // Show all rows
-          const values = line.split(',').map(value => value.trim().replace(/"/g, ''));
-          const row: CSVRow = {};
-          headers.forEach((header, index) => {
-            row[header] = values[index] || '';
-          });
-          return row;
-        });
-
-        setCsvData(data);
-      }
+      Papa.parse(text, {
+        header: true, // first row as headers
+        skipEmptyLines: true,
+        complete: function (results: any) {
+          setHeaders(results.meta.fields); // array of headers
+          setCsvData(results.data);       // array of row objects
+        }
+      });
     } catch (error) {
-      console.error('Error parsing CSV:', error);
+      console.error("Error parsing CSV:", error);
     } finally {
       setIsLoading(false);
     }

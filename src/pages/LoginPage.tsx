@@ -9,12 +9,15 @@ import { toast } from 'sonner';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 import { signInWithPopup } from 'firebase/auth';
+// @ts-ignore
+import { getDatabase, ref, child, get, set } from "firebase/database";
 
 export function LoginPage() {
   const navigate = useNavigate();
   useEffect(() => {
     document.title = 'Login | Synaptix-Labs';
   }, []);
+  const db = getDatabase()
 
   const handleGoogleSignIn = async () => {
     try {
@@ -24,6 +27,13 @@ export function LoginPage() {
       const user = result.user;
       console.log('Inside Login');
       console.log(user);
+      const dbRef = ref(db)
+      get(child(dbRef, 'U/' + user.uid)).then((snapshot: any) => {
+        if (!snapshot.exists()) {
+          set(ref(db, 'U/' + user.uid + '/E'), user.email)
+          set(ref(db, 'U/' + user.uid + '/C'), 'B2C')
+        }
+      });
       toast.success('Login successful! Redirecting...');
       setTimeout(() => {
         navigate('/upload');
