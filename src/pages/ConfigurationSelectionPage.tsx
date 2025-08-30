@@ -76,9 +76,9 @@ export function ConfigurationSelectionPage() {
           name: selectedConfig,
         },
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to extract PDF:', error);
-      toast.error('Failed to extract PDF. Please try again.');
+      toast.error(error);
     }
   }, [selectedConfig, pdfFile, extractPdf, navigate]);
 
@@ -107,7 +107,7 @@ export function ConfigurationSelectionPage() {
                   </Button>
                 </div>
               </div>
-            ) : isFetching && !hasLoaded.current ? (
+            ) : isFetching && hasLoaded.current ? (
               <div className="text-center py-4">Loading configurations...</div>
             ) : configurations.length === 0 ? (
               <div className="text-center py-4 text-gray-500">

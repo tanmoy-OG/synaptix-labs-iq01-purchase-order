@@ -30,7 +30,6 @@ export function usePdfUpload() {
     } catch (err) {
       const error = err instanceof Error ? err : new Error('An unknown error occurred');
       console.error('Configuration upload failed:', error);
-      toast.error('Failed to process file for configuration. Please try again.');
       throw error;
     } finally {
       setIsLoading(false);
@@ -70,7 +69,6 @@ export function usePdfUpload() {
     } catch (err) {
       const error = err instanceof Error ? err : new Error('An unknown error occurred');
       console.error('Extraction failed:', error);
-      toast.error('Failed to extract data. Please try again.');
       throw error;
     } finally {
       setIsLoading(false);

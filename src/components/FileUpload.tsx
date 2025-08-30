@@ -33,9 +33,9 @@ export function FileUpload() {
     try {
       const config = await configurePdf(selectedFile, auth.currentUser.uid);
       navigate('/data-configuration', { state: { data: config, file: selectedFile } });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to configure PDF:', error);
-      toast.error('Failed to process file. Please try again.');
+      toast.error(error);
     }
   };
 

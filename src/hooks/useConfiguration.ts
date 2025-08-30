@@ -49,9 +49,9 @@ export function useConfiguration() {
         return validConfigurations;
       } catch (error) {
         console.error('Failed to fetch configurations:', error);
-        const errorMessage =
-          error instanceof Error ? error.message : 'Failed to fetch configurations';
-        toast.error(errorMessage);
+        // const errorMessage =
+        //   error instanceof Error ? error.message : 'Failed to fetch configurations';
+        // toast.error(errorMessage);
         throw error;
       } finally {
         setIsLoading(false);
@@ -87,13 +87,13 @@ export function useConfiguration() {
         console.error('Failed to save configuration:', error);
 
         // Handle 409 Conflict error specifically
-        if (axios.isAxiosError(error) && error.response?.status === 409) {
-          toast.error(
-            `A configuration with the name "${config.name}" already exists. Please choose a different name.`
-          );
-        } else {
-          toast.error('Failed to save configuration. Please try again.');
-        }
+        // if (axios.isAxiosError(error) && error.response?.status === 409) {
+        //   toast.error(
+        //     `A configuration with the name "${config.name}" already exists. Please choose a different name.`
+        //   );
+        // } else {
+        //   toast.error('Failed to save configuration. Please try again.');
+        // }
         throw error;
       } finally {
         setIsLoading(false);
@@ -122,11 +122,11 @@ export function useConfiguration() {
         return response;
       } catch (error) {
         console.error('Failed to fetch configuration:', error);
-        if (axios.isAxiosError(error) && error.response?.status === 400) {
-          toast.error('Configuration does not exist');
-        } else {
-          toast.error('Failed to fetch configuration details. Please try again.');
-        }
+        // if (axios.isAxiosError(error) && error.response?.status === 400) {
+        //   toast.error('Configuration does not exist');
+        // } else {
+        //   toast.error('Failed to fetch configuration details. Please try again.');
+        // }
         throw error;
       } finally {
         setIsLoading(false);
@@ -151,7 +151,7 @@ export function useConfiguration() {
       toast.success(`Configuration "${name}" deleted successfully`);
     } catch (error) {
       console.error('Failed to delete configuration:', error);
-      toast.error('Failed to delete configuration. Please try again.');
+      // toast.error('Failed to delete configuration. Please try again.');
       throw error;
     } finally {
       setIsLoading(false);

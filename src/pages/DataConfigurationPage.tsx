@@ -86,9 +86,9 @@ export function DataConfigurationPage() {
           name: newConfig.name,
         },
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to process configuration:', error);
-      toast.error('Failed to process configuration. Please try again.');
+      toast.error(error);
     }
   };
 
