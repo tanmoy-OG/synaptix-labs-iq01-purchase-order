@@ -1,7 +1,6 @@
 import api from '@/lib/api/client';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
 import { ConfigurePdfResponse } from '@/types/api';
-import axios from 'axios';
 import { useCallback, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -47,8 +46,7 @@ export function useConfiguration() {
 
         setConfigurations(validConfigurations);
         return validConfigurations;
-      } catch (error) {
-        console.error('Failed to fetch configurations:', error);
+      } catch (error: any) {
         // const errorMessage =
         //   error instanceof Error ? error.message : 'Failed to fetch configurations';
         // toast.error(errorMessage);
@@ -83,8 +81,7 @@ export function useConfiguration() {
         console.log(res);
         console.log(config);
         toast.success(`Configuration "${config.name}" saved successfully`);
-      } catch (error) {
-        console.error('Failed to save configuration:', error);
+      } catch (error: any) {
 
         // Handle 409 Conflict error specifically
         // if (axios.isAxiosError(error) && error.response?.status === 409) {
@@ -120,14 +117,13 @@ export function useConfiguration() {
         );
         setConfiguration(response);
         return response;
-      } catch (error) {
-        console.error('Failed to fetch configuration:', error);
+      } catch (error: any) {
+        throw error;
         // if (axios.isAxiosError(error) && error.response?.status === 400) {
         //   toast.error('Configuration does not exist');
         // } else {
         //   toast.error('Failed to fetch configuration details. Please try again.');
         // }
-        throw error;
       } finally {
         setIsLoading(false);
       }
@@ -149,8 +145,7 @@ export function useConfiguration() {
       });
       setConfigurations(prev => prev.filter(config => config.name !== name));
       toast.success(`Configuration "${name}" deleted successfully`);
-    } catch (error) {
-      console.error('Failed to delete configuration:', error);
+    } catch (error: any) {
       // toast.error('Failed to delete configuration. Please try again.');
       throw error;
     } finally {

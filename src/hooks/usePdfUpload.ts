@@ -27,10 +27,8 @@ export function usePdfUpload() {
 
       toast.success('Data configuration initiated successfully');
       return response;
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('An unknown error occurred');
-      console.error('Configuration upload failed:', error);
-      throw error;
+    } catch (err: any) {
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -66,10 +64,8 @@ export function usePdfUpload() {
 
       toast.success('Data extracted successfully');
       return response;
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('An unknown error occurred');
-      console.error('Extraction failed:', error);
-      throw error;
+    } catch (err: any) {
+      throw err;
     } finally {
       setIsLoading(false);
     }

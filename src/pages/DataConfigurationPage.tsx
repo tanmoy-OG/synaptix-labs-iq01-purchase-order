@@ -87,8 +87,8 @@ export function DataConfigurationPage() {
         },
       });
     } catch (error: any) {
-      console.error('Failed to process configuration:', error);
-      toast.error(error);
+      console.error('Failed to process configuration:', error?.status);
+      toast.error(error?.message);
     }
   };
 

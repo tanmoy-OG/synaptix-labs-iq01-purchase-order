@@ -21,6 +21,7 @@ import { auth } from '@/lib/firebase';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export function ConfigurationsPage() {
   const navigate = useNavigate();
@@ -43,9 +44,9 @@ export function ConfigurationsPage() {
       setError(null);
       await fetchConfigurations(auth.currentUser.uid);
       hasLoaded.current = true;
-    } catch (err) {
-      setError('Failed to load configurations. Please try again.');
-      console.error('Error loading configurations:', err);
+    } catch (err: any) {
+      toast.error(err?.message);
+      console.error('Error loading configurations:', err?.status);
     }
   }, [fetchConfigurations]);
 
@@ -77,8 +78,9 @@ export function ConfigurationsPage() {
       await loadConfigurations();
       setDeleteDialogOpen(false);
       setConfigToDelete(null);
-    } catch (error) {
-      console.error('Error deleting configuration:', error);
+    } catch (error: any) {
+      console.error('Error deleting configuration:', error?.status);
+      toast.error(error?.message);
     }
   };
 

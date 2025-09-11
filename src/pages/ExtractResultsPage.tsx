@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Papa from 'papaparse';
+import { toast } from 'sonner';
 
 interface CSVRow {
   [key: string]: string;
@@ -37,8 +38,9 @@ export function ExtractResultsPage() {
           setCsvData(results.data);       // array of row objects
         }
       });
-    } catch (error) {
-      console.error("Error parsing CSV:", error);
+    } catch (error: any) {
+      console.error("Error parsing CSV:", error?.status);
+      toast.error(error?.message);
     } finally {
       setIsLoading(false);
     }

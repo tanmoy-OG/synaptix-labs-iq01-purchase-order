@@ -41,9 +41,9 @@ export function ConfigurationSelectionPage() {
       setError(null);
       await fetchConfigurations(auth.currentUser.uid);
       hasLoaded.current = true;
-    } catch (err) {
-      setError('Failed to load configurations. Please try again.');
-      console.error('Error loading configurations:', err);
+    } catch (err: any) {
+      console.error(err?.status);
+      toast.error(err?.message);
     }
   }, [fetchConfigurations]);
 
@@ -77,8 +77,8 @@ export function ConfigurationSelectionPage() {
         },
       });
     } catch (error: any) {
-      console.error('Failed to extract PDF:', error);
-      toast.error(error);
+      console.error('Failed to extract PDF:', error?.status);
+      toast.error(error?.message);
     }
   }, [selectedConfig, pdfFile, extractPdf, navigate]);
 

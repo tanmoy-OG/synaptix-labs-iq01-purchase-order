@@ -38,12 +38,9 @@ export function LoginPage() {
       setTimeout(() => {
         navigate('/upload');
       }, 1000);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        toast.error(error.message || 'Login failed. Please try again.');
-      } else {
-        toast.error('Login failed. Please try again.');
-      }
+    } catch (error: any) {
+      console.error(error?.status);
+      toast.error(error?.message);
     }
   };
 

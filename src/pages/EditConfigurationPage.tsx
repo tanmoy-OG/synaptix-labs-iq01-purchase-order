@@ -36,8 +36,9 @@ export function EditConfigurationPage() {
       try {
         const data = await editConfiguration(configName, auth.currentUser.uid);
         setConfig(data);
-      } catch (error) {
-        console.error('Error loading configuration:', error);
+      } catch (error: any) {
+        console.error('Error loading configuration:', error?.status);
+        toast.error(error?.message);
         navigate('/configurations');
       }
     };
@@ -93,9 +94,9 @@ export function EditConfigurationPage() {
 
       // Navigate back to the edit configuration page
       navigate('/configurations');
-    } catch (error) {
-      console.error('Error saving configuration:', error);
-      toast.error('Failed to save configuration. Please try again.');
+    } catch (error: any) {
+      console.error('Error saving configuration:', error?.status);
+      toast.error(error?.message);
     }
   };
 
