@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { ConfigurePdfResponse, FieldConfig } from '@/types/api';
-import axios from 'axios';
 import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -64,23 +63,17 @@ const DialogFooter = ({ children }: { children: React.ReactNode }) => (
 
 interface FieldConfigurationViewProps {
   fieldConfig: ConfigurePdfResponse;
-  onSave: (config: ConfigurePdfResponse) => void;
   onCancel: () => void;
-  isSaving: boolean;
-  isExtracting: boolean;
+  onNext: () => void;
 }
 
 export function FieldConfigurationView({
   fieldConfig,
-  onSave,
   onCancel,
-  isSaving,
-  isExtracting,
+  onNext,
 }: FieldConfigurationViewProps) {
   const [config, setConfig] = useState<ConfigurePdfResponse>(fieldConfig);
-  const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [name, setConfigName] = useState(fieldConfig.name);
   const [newField, setNewField] = useState<{
     fieldname: string;
     type: 'header' | 'item';
@@ -96,7 +89,6 @@ export function FieldConfigurationView({
   // Update local state when prop changes
   useEffect(() => {
     setConfig(fieldConfig);
-    setConfigName(fieldConfig.name);
   }, [fieldConfig]);
 
   const handleFieldChange = (
@@ -117,33 +109,6 @@ export function FieldConfigurationView({
     }));
   };
 
-  const handleSaveClick = () => {
-    setShowSaveDialog(true);
-  };
-
-  const handleSaveConfirm = async () => {
-    if (!name.trim()) {
-      toast.error('Please enter a configuration name');
-      return;
-    }
-
-    try {
-      await onSave({
-        ...config,
-        name: name.trim(),
-      });
-      setShowSaveDialog(false);
-    } catch (error) {
-      // If it's a 409 error, keep the dialog open so user can change the name
-      if (axios.isAxiosError(error) && error.response?.status === 409) {
-        // Dialog will stay open, allowing user to modify the name
-        return;
-      }
-      // For other errors, close the dialog
-      setShowSaveDialog(false);
-    }
-  };
-
   const handleAddField = () => {
     if (!newField.label.trim()) {
       toast.error('Please enter a field label');
@@ -161,6 +126,7 @@ export function FieldConfigurationView({
       label: newField.label,
       logic: 2, // Default to AI Prompt
       prompt: newField.prompt,
+      pos: 0,
       selected: true,
       first: newField.fieldname, // Using fieldname as first value
     };
@@ -284,40 +250,8 @@ export function FieldConfigurationView({
         <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button onClick={handleSaveClick}>Save Configuration</Button>
+        <Button onClick={onNext}>Next</Button>
       </div>
-
-      {/* Save Configuration Dialog */}
-      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Save Configuration</DialogTitle>
-            <DialogDescription>
-              Enter a name for this configuration. This will help you identify and reuse this
-              configuration later.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Configuration Name</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={e => setConfigName(e.target.value)}
-                placeholder="Enter configuration name"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowSaveDialog(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSaveConfirm} disabled={isSaving || isExtracting || !name.trim()}>
-              {isSaving ? 'Saving...' : isExtracting ? 'Extracting...' : 'Save'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Add Field Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>

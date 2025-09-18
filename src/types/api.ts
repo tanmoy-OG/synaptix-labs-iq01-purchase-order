@@ -49,6 +49,7 @@ export interface FieldConfig {
   fieldname: string;
   label: string;
   logic: 0 | 1 | 2;
+  pos: number;
   prompt: string;
   selected: boolean;
   first: string;

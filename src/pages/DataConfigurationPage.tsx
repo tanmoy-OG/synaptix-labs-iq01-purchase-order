@@ -2,8 +2,6 @@ import { FieldConfigurationView } from '@/components/FieldConfigurationView';
 import { FieldsSelectionView } from '@/components/FieldsSelectionView';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useConfiguration } from '@/hooks/useConfiguration';
-import { usePdfUpload } from '@/hooks/usePdfUpload';
-import { auth } from '@/lib/firebase';
 import { ConfigurePdfResponse } from '@/types/api';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -15,24 +13,29 @@ export function DataConfigurationPage() {
   const {
     configuration,
     updateConfiguration,
-    saveConfiguration,
-    isLoading: isSaving,
   } = useConfiguration();
-  const { extractPdf, isLoading: isExtracting } = usePdfUpload();
   const [showFieldConfig, setShowFieldConfig] = useState(false);
 
   // Get initial configuration and file from location state
-  const initialConfig = location.state?.data as ConfigurePdfResponse;
+  const initialConfig = (location.state?.data || location.state?.config) as ConfigurePdfResponse;
   const pdfFile = location.state?.file as File;
 
   useEffect(() => {
-    if (!initialConfig || !pdfFile) {
+    // If coming back from sort page, allow missing file and skip redirect
+    const fromSort = location.state?.fromSort as boolean | undefined;
+    if (!initialConfig || (!pdfFile && !fromSort)) {
       toast.error('No configuration data or file available');
-      navigate('/');
+      navigate('/upload');
       return;
     }
-    updateConfiguration(initialConfig);
-  }, [initialConfig, pdfFile, navigate, updateConfiguration]);
+    if (initialConfig) {
+      updateConfiguration(initialConfig);
+      // If coming from sort page, show field configuration view directly
+      if (fromSort) {
+        setShowFieldConfig(true);
+      }
+    }
+  }, [initialConfig, pdfFile, navigate, updateConfiguration, location.state]);
 
   const handleFieldSelect = (section: 'header' | 'item', fieldId: string, selected: boolean) => {
     if (!configuration) return;
@@ -66,31 +69,9 @@ export function DataConfigurationPage() {
     setShowFieldConfig(true);
   };
 
-  const handleSave = async (newConfig: ConfigurePdfResponse) => {
-    if (!auth.currentUser?.uid) {
-      toast.error('User not authenticated');
-      return;
-    }
-
-    try {
-      // First save the configuration
-      await saveConfiguration(newConfig, auth.currentUser.uid);
-
-      // Then extract the PDF with the saved configuration
-      const extractionResult = await extractPdf(pdfFile, newConfig.name, auth.currentUser.uid);
-
-      // Navigate to results page with the extraction data
-      navigate('/extract-results', {
-        state: {
-          data: extractionResult,
-          name: newConfig.name,
-        },
-      });
-    } catch (error: any) {
-      console.error('Failed to process configuration:', error?.status);
-      toast.error(error?.message);
-    }
-  };
+  const handleNext = () => {
+    navigate('/sort-configuration', { state: { data: configuration, file: pdfFile } })
+  }
 
   const handleCancel = () => {
     toast.error('Configuration cancelled');
@@ -111,10 +92,8 @@ export function DataConfigurationPage() {
           {showFieldConfig ? (
             <FieldConfigurationView
               fieldConfig={configuration}
-              onSave={handleSave}
               onCancel={() => setShowFieldConfig(false)}
-              isSaving={isSaving}
-              isExtracting={isExtracting}
+              onNext={handleNext}
             />
           ) : (
             <FieldsSelectionView

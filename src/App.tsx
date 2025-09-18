@@ -10,6 +10,7 @@ import { EditConfigurationPage } from './pages/EditConfigurationPage';
 import { ExtractResultsPage } from './pages/ExtractResultsPage';
 import { LoginPage } from './pages/LoginPage';
 import { UploadPage } from './pages/UploadPage';
+import { SortConfigurationPage } from './pages/SortConfigurationPage';
 
 // Create a client
 const queryClient = new QueryClient();
@@ -46,6 +47,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DataConfigurationPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/sort-configuration"
+              element={
+                <ProtectedRoute>
+                  <SortConfigurationPage />
                 </ProtectedRoute>
               }
             />
