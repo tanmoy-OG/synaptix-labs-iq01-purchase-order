@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ConfigurePdfResponse } from '@/types/api';
-import { useMemo, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -65,31 +65,49 @@ export function SortConfiguration({ config, onSave, isSaving, isExtracting }: So
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [name, setConfigName] = useState(config.name);
 
+  // Compute display label for a field
+  const getFieldDisplay = (field: { label?: string; fieldname: string }) => field.label || field.fieldname;
+
+  // Compute headers sorted by position; items with pos===0 fall to the end in alpha order
+  const computeSortedHeaders = (cfg: ConfigurePdfResponse) => {
+    const selectedFields = [
+      ...Object.values(cfg.header).filter((f) => f.selected),
+      ...Object.values(cfg.item).filter((f) => f.selected),
+    ];
+
+    const sorted = [...selectedFields].sort((a, b) => {
+      const ap = a.pos || 0;
+      const bp = b.pos || 0;
+      if (ap === 0 && bp === 0) return getFieldDisplay(a).localeCompare(getFieldDisplay(b));
+      if (ap === 0) return 1;
+      if (bp === 0) return -1;
+      return ap - bp;
+    });
+    return sorted.map(getFieldDisplay);
+  };
+
+  // On load and when config changes:
+  // 1) Only assign positions to selected fields with pos===0, starting after current max pos among selected
+  // 2) Ensure headers default order follows the pos values
   useEffect(() => {
-    let nextPos = 1;
-    Object.values(config.header).forEach((field) => {
-      if (field.selected) {
+    const selectedFields = [
+      ...Object.values(config.header).filter((f) => f.selected),
+      ...Object.values(config.item).filter((f) => f.selected),
+    ];
+
+    const maxExistingPos = selectedFields.reduce((max, f) => (f.pos && f.pos > 0 ? Math.max(max, f.pos) : max), 0);
+    let nextPos = maxExistingPos + 1;
+
+    selectedFields.forEach((field) => {
+      if (!field.pos || field.pos === 0) {
         field.pos = nextPos++;
       }
     });
-    Object.values(config.item).forEach((field) => {
-      if (field.selected) {
-        field.pos = nextPos++;
-      }
-    });
+
+    setHeaders(computeSortedHeaders(config));
   }, [config]);
 
-  const initialHeaders = useMemo(() => {
-    const headerFields = Object.entries(config.header)
-      .filter(([, f]) => f.selected)
-      .map(([, f]) => f.label || f.fieldname);
-    const itemFields = Object.entries(config.item)
-      .filter(([, f]) => f.selected)
-      .map(([, f]) => f.label || f.fieldname);
-    return [...headerFields, ...itemFields];
-  }, [config]);
-
-  const [headers, setHeaders] = useState<string[]>(initialHeaders);
+  const [headers, setHeaders] = useState<string[]>(() => computeSortedHeaders(config));
   const [dragIndex, setDragIndex] = useState<number | null>(null);
 
   const applyPositionsFromHeaders = (orderedHeaders: string[]) => {
