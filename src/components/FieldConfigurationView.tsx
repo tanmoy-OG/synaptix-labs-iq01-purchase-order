@@ -65,12 +65,14 @@ interface FieldConfigurationViewProps {
   fieldConfig: ConfigurePdfResponse;
   onCancel: () => void;
   onNext: () => void;
+  onChange?: (updated: ConfigurePdfResponse) => void;
 }
 
 export function FieldConfigurationView({
   fieldConfig,
   onCancel,
   onNext,
+  onChange,
 }: FieldConfigurationViewProps) {
   const [config, setConfig] = useState<ConfigurePdfResponse>(fieldConfig);
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -97,16 +99,20 @@ export function FieldConfigurationView({
     key: keyof FieldConfig,
     value: string | number | boolean
   ) => {
-    setConfig(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [fieldId]: {
-          ...prev[section][fieldId],
-          [key]: value,
+    setConfig(prev => {
+      const updated: ConfigurePdfResponse = {
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [fieldId]: {
+            ...prev[section][fieldId],
+            [key]: value,
+          },
         },
-      },
-    }));
+      };
+      onChange?.(updated);
+      return updated;
+    });
   };
 
   const handleAddField = () => {
@@ -120,7 +126,7 @@ export function FieldConfigurationView({
       return;
     }
 
-    const fieldId = Object.keys(config[newField.type]).length + 1;
+    const fieldId = (Object.keys(config[newField.type]).length + 1).toString();
     const newFieldConfig: FieldConfig = {
       fieldname: newField.fieldname,
       label: newField.label,
@@ -131,13 +137,17 @@ export function FieldConfigurationView({
       first: newField.fieldname, // Using fieldname as first value
     };
 
-    setConfig(prev => ({
-      ...prev,
-      [newField.type]: {
-        ...prev[newField.type],
-        [fieldId]: newFieldConfig,
-      },
-    }));
+    setConfig(prev => {
+      const updated: ConfigurePdfResponse = {
+        ...prev,
+        [newField.type]: {
+          ...prev[newField.type],
+          [fieldId]: newFieldConfig,
+        },
+      };
+      onChange?.(updated);
+      return updated;
+    });
 
     // Reset form and close dialog
     setNewField({
@@ -219,7 +229,7 @@ export function FieldConfigurationView({
       {/* Floating Add Button */}
       <Button
         onClick={() => setShowAddDialog(true)}
-        className="fixed bottom-8 right-8 rounded-full w-14 h-14 shadow-lg"
+        className="fixed bottom-20 right-8 rounded-full w-14 h-14 z-20 shadow-lg"
         size="icon"
       >
         <Plus className="h-6 w-6" />

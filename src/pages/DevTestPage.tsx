@@ -77,7 +77,7 @@ export function DevTestPage() {
             {showFieldConfig ? (
               <FieldConfigurationView
                 fieldConfig={config}
-                onSave={handleSaveConfig}
+                onChange={(updated) => setConfig(updated)}
                 onCancel={handleCancel}
               />
             ) : (

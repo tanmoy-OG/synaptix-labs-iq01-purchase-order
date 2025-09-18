@@ -92,6 +92,7 @@ export function DataConfigurationPage() {
           {showFieldConfig ? (
             <FieldConfigurationView
               fieldConfig={configuration}
+              onChange={updateConfiguration}
               onCancel={() => setShowFieldConfig(false)}
               onNext={handleNext}
             />

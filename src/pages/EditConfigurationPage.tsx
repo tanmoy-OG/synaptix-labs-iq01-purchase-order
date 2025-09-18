@@ -106,6 +106,7 @@ export function EditConfigurationPage() {
           {showFieldConfig ? (
             <FieldConfigurationView
               fieldConfig={config}
+              onChange={(updated) => setConfig(updated)}
               onCancel={() => setShowFieldConfig(false)}
               onNext={handleNext}
             />
