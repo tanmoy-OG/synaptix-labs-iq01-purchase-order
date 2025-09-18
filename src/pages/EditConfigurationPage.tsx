@@ -104,6 +104,10 @@ export function EditConfigurationPage() {
     navigate('/configurations');
   }, [navigate]);
 
+  const handleNext = () => {
+    navigate('/sort-configuration', { state: { data: config } })
+  }
+
   if (!config) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -122,10 +126,8 @@ export function EditConfigurationPage() {
           {showFieldConfig ? (
             <FieldConfigurationView
               fieldConfig={config}
-              onSave={handleSave}
               onCancel={() => setShowFieldConfig(false)}
-              isSaving={isSaving}
-              isExtracting={isExtracting}
+              onNext={handleNext}
             />
           ) : (
             <FieldsSelectionView

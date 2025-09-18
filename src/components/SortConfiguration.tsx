@@ -187,9 +187,6 @@ export function SortConfiguration({ config, onSave, isSaving, isExtracting }: So
 
       <div className="flex justify-end gap-3">
         <Button variant="outline" onClick={() => navigate('/data-configuration', { state: { config, fromSort: true } })}>Back</Button>
-        <Button onClick={() => navigate('/extract-results', { state: { name: config.name } })}>
-          Continue
-        </Button>
         <Button onClick={handleSaveClick}>Save Configuration</Button>
       </div>
 

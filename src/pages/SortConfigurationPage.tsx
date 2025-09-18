@@ -17,7 +17,7 @@ export function SortConfigurationPage() {
   } = useConfiguration();
   const { extractPdf, isLoading: isExtracting } = usePdfUpload();
   const config = (location.state?.data || location.state?.config) as ConfigurePdfResponse;
-  const pdfFile = location.state?.file as File;
+  const pdfFile = location.state?.file as File || null;
 
   useEffect(() => {
     if (!config) {
@@ -37,17 +37,20 @@ export function SortConfigurationPage() {
     try {
       // First save the configuration
       await saveConfiguration(newConfig, auth.currentUser.uid);
+      
+      if (pdfFile) {
+        // Then extract the PDF with the saved configuration
+        const extractionResult = await extractPdf(pdfFile, newConfig.name, auth.currentUser.uid);
 
-      // Then extract the PDF with the saved configuration
-      const extractionResult = await extractPdf(pdfFile, newConfig.name, auth.currentUser.uid);
-
-      // Navigate to results page with the extraction data
-      navigate('/extract-results', {
-        state: {
-          data: extractionResult,
-          name: newConfig.name,
-        },
-      });
+        // Navigate to results page with the extraction data
+        navigate('/extract-results', {
+          state: {
+            data: extractionResult,
+            name: newConfig.name,
+          },
+        });
+      }
+      else navigate('/configurations')
     } catch (error: any) {
       console.error('Failed to process configuration:', error?.status);
       toast.error(error?.message);
