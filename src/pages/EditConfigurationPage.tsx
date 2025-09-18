@@ -2,7 +2,6 @@ import { FieldConfigurationView } from '@/components/FieldConfigurationView';
 import { FieldsSelectionView } from '@/components/FieldsSelectionView';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useConfiguration } from '@/hooks/useConfiguration';
-import { usePdfUpload } from '@/hooks/usePdfUpload';
 import { auth } from '@/lib/firebase';
 import { ConfigurePdfResponse } from '@/types/api';
 import { useCallback, useEffect, useState } from 'react';
@@ -12,8 +11,7 @@ import { toast } from 'sonner';
 export function EditConfigurationPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { editConfiguration, saveConfiguration, isLoading: isSaving } = useConfiguration();
-  const { isLoading: isExtracting } = usePdfUpload();
+  const { editConfiguration } = useConfiguration();
   const [config, setConfig] = useState<ConfigurePdfResponse | null>(null);
   const [showFieldConfig, setShowFieldConfig] = useState(false);
 
@@ -80,24 +78,6 @@ export function EditConfigurationPage() {
     }
 
     setShowFieldConfig(true);
-  };
-
-  const handleSave = async (newConfig: ConfigurePdfResponse) => {
-    if (!auth.currentUser?.uid) {
-      toast.error('User not authenticated');
-      return;
-    }
-
-    try {
-      // First save the configuration
-      await saveConfiguration(newConfig, auth.currentUser.uid);
-
-      // Navigate back to the edit configuration page
-      navigate('/configurations');
-    } catch (error: any) {
-      console.error('Error saving configuration:', error?.status);
-      toast.error(error?.message);
-    }
   };
 
   const handleCancel = useCallback(() => {
