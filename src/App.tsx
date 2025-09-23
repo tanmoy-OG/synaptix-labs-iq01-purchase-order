@@ -5,7 +5,6 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { ConfigurationSelectionPage } from './pages/ConfigurationSelectionPage';
 import { ConfigurationsPage } from './pages/ConfigurationsPage';
 import { DataConfigurationPage } from './pages/DataConfigurationPage';
-import { DevTestPage } from './pages/DevTestPage';
 import { EditConfigurationPage } from './pages/EditConfigurationPage';
 import { ExtractResultsPage } from './pages/ExtractResultsPage';
 import { LoginPage } from './pages/LoginPage';
@@ -15,17 +14,11 @@ import { SortConfigurationPage } from './pages/SortConfigurationPage';
 // Create a client
 const queryClient = new QueryClient();
 
-// Check if in development mode
-const isDev = import.meta.env.DEV;
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        {isDev && import.meta.env.VITE_ENABLE_TEST_PAGE === 'true' ? (
-          <DevTestPage />
-        ) : (
-          <Routes>
+        <Routes>
             <Route
               path="/"
               element={
@@ -91,7 +84,6 @@ function App() {
               }
             />
           </Routes>
-        )}
         <Toaster position="top-right" />
       </BrowserRouter>
     </QueryClientProvider>
