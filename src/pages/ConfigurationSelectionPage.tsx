@@ -107,9 +107,9 @@ export function ConfigurationSelectionPage() {
                   </Button>
                 </div>
               </div>
-            ) : isFetching && hasLoaded.current ? (
+            ) : isFetching ? (
               <div className="text-center py-4">Loading configurations...</div>
-            ) : configurations.length === 0 ? (
+            ) : !isFetching && configurations.length === 0 ? (
               <div className="text-center py-4 text-gray-500">
                 <p>No configurations found. Please create a configuration first.</p>
                 <div className="mt-4">
