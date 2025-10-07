@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 export function ConfigurationSelectionPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { configurations, fetchConfigurations, isLoading: isFetching } = useConfiguration();
+  const { configurations, fetchConfigurations, isLoading} = useConfiguration();
   const { extractPdf, isLoading: isExtracting } = usePdfUpload();
   const [selectedConfig, setSelectedConfig] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -107,9 +107,9 @@ export function ConfigurationSelectionPage() {
                   </Button>
                 </div>
               </div>
-            ) : isFetching ? (
+            ) : isLoading ? (
               <div className="text-center py-4">Loading configurations...</div>
-            ) : !isFetching && configurations.length === 0 ? (
+            ) : !isLoading && !hasLoaded.current && configurations.length === 0 ? (
               <div className="text-center py-4 text-gray-500">
                 <p>No configurations found. Please create a configuration first.</p>
                 <div className="mt-4">
@@ -154,7 +154,7 @@ export function ConfigurationSelectionPage() {
                 </Button>
                 <Button
                   onClick={handleExtract}
-                  disabled={!selectedConfig || isFetching || isExtracting}
+                  disabled={!selectedConfig || isLoading || isExtracting}
                 >
                   {isExtracting ? 'Extracting...' : 'Extract PDF'}
                 </Button>
