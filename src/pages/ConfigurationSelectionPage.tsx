@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 export function ConfigurationSelectionPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { configurations, fetchConfigurations, isLoading} = useConfiguration();
+  const { configurations, fetchConfigurations, isLoading } = useConfiguration();
   const { extractPdf, isLoading: isExtracting } = usePdfUpload();
   const [selectedConfig, setSelectedConfig] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +77,7 @@ export function ConfigurationSelectionPage() {
         },
       });
     } catch (error: any) {
-      console.error('Failed to extract PDF:', error?.status);
+      console.error('Failed to extract PDF:', error?.message);
       toast.error(error?.message);
     }
   }, [selectedConfig, pdfFile, extractPdf, navigate]);

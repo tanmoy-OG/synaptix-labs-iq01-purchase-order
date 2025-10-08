@@ -37,7 +37,7 @@ export function SortConfigurationPage() {
     try {
       // First save the configuration
       await saveConfiguration(newConfig, auth.currentUser.uid);
-      
+
       if (pdfFile) {
         // Then extract the PDF with the saved configuration
         const extractionResult = await extractPdf(pdfFile, newConfig.name, auth.currentUser.uid);
@@ -52,7 +52,7 @@ export function SortConfigurationPage() {
       }
       else navigate('/configurations')
     } catch (error: any) {
-      console.error('Failed to process configuration:', error?.status);
+      console.error('Failed to process configuration:', error?.message);
       toast.error(error?.message);
     }
   };

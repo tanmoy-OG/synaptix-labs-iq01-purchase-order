@@ -79,7 +79,7 @@ export function ConfigurationsPage() {
       setDeleteDialogOpen(false);
       setConfigToDelete(null);
     } catch (error: any) {
-      console.error('Error deleting configuration:', error?.status);
+      console.error('Error deleting configuration:', error?.message);
       toast.error(error?.message);
     }
   };

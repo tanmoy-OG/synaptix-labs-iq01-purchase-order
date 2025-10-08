@@ -39,7 +39,7 @@ export function ExtractResultsPage() {
         }
       });
     } catch (error: any) {
-      console.error("Error parsing CSV:", error?.status);
+      console.error("Error parsing CSV:", error?.message);
       toast.error(error?.message);
     } finally {
       setIsLoading(false);

@@ -46,12 +46,28 @@ export function useConfiguration() {
 
         setConfigurations(validConfigurations);
         return validConfigurations;
-      } catch (error: any) {
-        // const errorMessage =
-        //   error instanceof Error ? error.message : 'Failed to fetch configurations';
-        // toast.error(errorMessage);
-        throw error;
-      } finally {
+      } catch (err: any) {
+        let message = "Unknown error";
+        if (err.response?.data instanceof Blob) {
+          try {
+            const text = await err.response.data.text(); // convert blob -> text
+            const json = JSON.parse(text);
+            message = json.message || json.err || message;
+          }
+          catch {
+            message = "Failed to read error message";
+          }
+        }
+        else {
+          message =
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          err.message ||
+          message;
+        }
+        throw new Error(message);
+        //throw err;
+    } finally {
         setIsLoading(false);
         isFetching.current = false;
       }
@@ -79,18 +95,28 @@ export function useConfiguration() {
         console.log(res);
         console.log(config);
         toast.success(`Configuration "${config.name}" saved successfully`);
-      } catch (error: any) {
-
-        // Handle 409 Conflict error specifically
-        // if (axios.isAxiosError(error) && error.response?.status === 409) {
-        //   toast.error(
-        //     `A configuration with the name "${config.name}" already exists. Please choose a different name.`
-        //   );
-        // } else {
-        //   toast.error('Failed to save configuration. Please try again.');
-        // }
-        throw error;
-      } finally {
+      } catch (err: any) {
+        let message = "Unknown error";
+        if (err.response?.data instanceof Blob) {
+          try {
+            const text = await err.response.data.text(); // convert blob -> text
+            const json = JSON.parse(text);
+            message = json.message || json.err || message;
+          }
+          catch {
+            message = "Failed to read error message";
+          }
+        }
+        else {
+          message =
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          err.message ||
+          message;
+        }
+        throw new Error(message);
+        //throw err;
+    } finally {
         setIsLoading(false);
       }
     },
@@ -115,14 +141,28 @@ export function useConfiguration() {
         );
         setConfiguration(response);
         return response;
-      } catch (error: any) {
-        throw error;
-        // if (axios.isAxiosError(error) && error.response?.status === 400) {
-        //   toast.error('Configuration does not exist');
-        // } else {
-        //   toast.error('Failed to fetch configuration details. Please try again.');
-        // }
-      } finally {
+      } catch (err: any) {
+        let message = "Unknown error";
+        if (err.response?.data instanceof Blob) {
+          try {
+            const text = await err.response.data.text(); // convert blob -> text
+            const json = JSON.parse(text);
+            message = json.message || json.err || message;
+          }
+          catch {
+            message = "Failed to read error message";
+          }
+        }
+        else {
+          message =
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          err.message ||
+          message;
+        }
+        throw new Error(message);
+        //throw err;
+    } finally {
         setIsLoading(false);
       }
     },
@@ -143,10 +183,28 @@ export function useConfiguration() {
       });
       setConfigurations(prev => prev.filter(config => config.name !== name));
       toast.success(`Configuration "${name}" deleted successfully`);
-    } catch (error: any) {
-      // toast.error('Failed to delete configuration. Please try again.');
-      throw error;
-    } finally {
+    } catch (err: any) {
+      let message = "Unknown error";
+      if (err.response?.data instanceof Blob) {
+        try {
+          const text = await err.response.data.text(); // convert blob -> text
+          const json = JSON.parse(text);
+          message = json.message || json.err || message;
+        }
+        catch {
+          message = "Failed to read error message";
+        }
+      }
+      else {
+        message =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        message;
+      }
+      throw new Error(message);
+      //throw err;
+    } finally {
       setIsLoading(false);
     }
   }, []);

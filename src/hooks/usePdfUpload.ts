@@ -28,8 +28,27 @@ export function usePdfUpload() {
       toast.success('Data configuration initiated successfully');
       return response;
     } catch (err: any) {
-      throw err;
-    } finally {
+      let message = "Unknown error";
+      if (err.response?.data instanceof Blob) {
+        try {
+          const text = await err.response.data.text(); // convert blob -> text
+          const json = JSON.parse(text);
+          message = json.message || json.err || message;
+        }
+        catch {
+          message = "Failed to read error message";
+        }
+      }
+      else {
+        message =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        message;
+      }
+      throw new Error(message);
+      //throw err;
+    } finally {
       setIsLoading(false);
     }
   };
@@ -56,8 +75,27 @@ export function usePdfUpload() {
       toast.success('Data extracted successfully');
       return response;
     } catch (err: any) {
-      throw err;
-    } finally {
+      let message = "Unknown error";
+      if (err.response?.data instanceof Blob) {
+        try {
+          const text = await err.response.data.text(); // convert blob -> text
+          const json = JSON.parse(text);
+          message = json.message || json.err || message;
+        }
+        catch {
+          message = "Failed to read error message";
+        }
+      }
+      else {
+        message =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        message;
+      }
+      throw new Error(message);
+      //throw err;
+    } finally {
       setIsLoading(false);
     }
   };

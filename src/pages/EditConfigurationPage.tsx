@@ -35,7 +35,7 @@ export function EditConfigurationPage() {
         const data = await editConfiguration(configName, auth.currentUser.uid);
         setConfig(data);
       } catch (error: any) {
-        console.error('Error loading configuration:', error?.status);
+        console.error('Error loading configuration:', error?.message);
         toast.error(error?.message);
         navigate('/configurations');
       }

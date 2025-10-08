@@ -39,7 +39,7 @@ export function LoginPage() {
         navigate('/upload');
       }, 1000);
     } catch (error: any) {
-      console.error(error?.status);
+      console.error(error?.message);
       toast.error(error?.message);
     }
   };
