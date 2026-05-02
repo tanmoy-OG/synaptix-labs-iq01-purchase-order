@@ -15,9 +15,15 @@ import { SortConfigurationPage } from './pages/SortConfigurationPage';
 const queryClient = new QueryClient();
 
 function App() {
+  const getBaseUrl = () => {
+  if (window.location.pathname.startsWith('/iq02')) {
+    return '/iq02';
+  }
+  return '/';
+};
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <BrowserRouter basename={getBaseUrl()}>
         <Routes>
             <Route
               path="/"
