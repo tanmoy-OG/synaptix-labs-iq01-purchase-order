@@ -15,7 +15,7 @@ export function usePdfUpload() {
     try {
       // Use our API client to upload the file
       const formData = new FormData();
-      formData.append('pdf_file', file);
+      formData.append('file', file);
       formData.append('mode', 'configure');
       formData.append('uid', uid);
 
@@ -28,38 +28,33 @@ export function usePdfUpload() {
       toast.success('Data configuration initiated successfully');
       return response;
     } catch (err: any) {
-      let message = "Unknown error";
+      let message = 'Unknown error';
       if (err.response?.data instanceof Blob) {
         try {
           const text = await err.response.data.text(); // convert blob -> text
           const json = JSON.parse(text);
           message = json.message || json.err || message;
+        } catch {
+          message = 'Failed to read error message';
         }
-        catch {
-          message = "Failed to read error message";
-        }
-      }
-      else {
+      } else {
         message =
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        err.message ||
-        message;
+          err.response?.data?.message || err.response?.data?.error || err.message || message;
       }
       throw new Error(message);
       //throw err;
-    } finally {
+    } finally {
       setIsLoading(false);
     }
   };
 
   const extractPdf = async (file: File, configName: string, uid: string): Promise<Blob> => {
     setIsLoading(true);
-    
+
     try {
       // Use our API client to upload the file for extraction
       const formData = new FormData();
-      formData.append('pdf_file', file);
+      formData.append('file', file);
       formData.append('mode', 'extract');
       formData.append('config_name', configName);
       formData.append('uid', uid);
@@ -75,27 +70,22 @@ export function usePdfUpload() {
       toast.success('Data extracted successfully');
       return response;
     } catch (err: any) {
-      let message = "Unknown error";
+      let message = 'Unknown error';
       if (err.response?.data instanceof Blob) {
         try {
           const text = await err.response.data.text(); // convert blob -> text
           const json = JSON.parse(text);
           message = json.message || json.err || message;
+        } catch {
+          message = 'Failed to read error message';
         }
-        catch {
-          message = "Failed to read error message";
-        }
-      }
-      else {
+      } else {
         message =
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        err.message ||
-        message;
+          err.response?.data?.message || err.response?.data?.error || err.message || message;
       }
       throw new Error(message);
       //throw err;
-    } finally {
+    } finally {
       setIsLoading(false);
     }
   };
