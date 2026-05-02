@@ -16,8 +16,8 @@ const queryClient = new QueryClient();
 
 function App() {
   const getBaseUrl = () => {
-  if (window.location.pathname.startsWith('/iq02')) {
-    return '/iq02';
+  if (window.location.pathname.startsWith('/iq01')) {
+    return '/iq01';
   }
   return '/';
 };
